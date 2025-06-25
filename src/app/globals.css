@@ -35,3 +35,43 @@
 	--depth: 1;
 	--noise: 1;
 }
+
+/* ::view-transition {
+	transition: 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+	transition-property: transform, opacity, background-color, color, filter;
+	will-change: transform, opacity;
+	backface-visibility: hidden;
+	transform-style: preserve-3d;
+}
+
+::view-transition-old(root) {
+	opacity: 0;
+	transform: scale(0.98);
+}
+
+::view-transition-new(root) {
+	opacity: 1;
+	transform: scale(1);
+} */
+
+::view-transition-old(page-create-dao),
+::view-transition-new(page-create-dao) {
+	transition: transform 0.5s ease, opacity 0.3s ease;
+}
+
+::view-transition-old(page-create-dao) {
+	opacity: 0;
+	transform: translateX(-50px) scale(0.9) rotate(-3deg);
+}
+
+::view-transition-new(page-create-dao) {
+	opacity: 1;
+	transform: translateX(0) scale(1) rotate(0);
+}
+
+/* ::view-transition-old(page-create-dao) {
+	animation: slideOutRight 0.4s ease forwards;
+}
+::view-transition-new(page-create-dao) {
+	animation: slideInLeft 0.4s ease forwards;
+} */
