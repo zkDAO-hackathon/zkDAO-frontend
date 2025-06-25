@@ -5,8 +5,11 @@ import { FaPlus } from "react-icons/fa6";
 import { useAccount } from "wagmi";
 import CardDAO from "../CardDAO";
 import { DATACARDDAO } from "@/app/data/example.data";
+import { useRouter } from "next/navigation";
+import { unstable_ViewTransition as ViewTransition } from "react";
 
 const BoxDAOS = () => {
+	const router = useRouter();
 	const { isConnected: isAccountConnected } = useAccount();
 	const [searchQuery, setSearchQuery] = useState("");
 	const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
@@ -39,10 +42,12 @@ const BoxDAOS = () => {
 					<FaSearch />
 					<input type='text' value={searchQuery} onChange={handleSearchChange} placeholder='Search DAOs...' />
 				</label>
-				<button className='btn btn-primary rounded-full' disabled={!isAccountConnected}>
-					<FaPlus className='inline mr-2' />
-					Create DAO
-				</button>
+				<ViewTransition name='page-create-dao'>
+					<button className='btn btn-primary rounded-full' disabled={!isAccountConnected} onClick={() => router.push("/create-dao")}>
+						<FaPlus className='inline mr-2' />
+						Create DAO
+					</button>
+				</ViewTransition>
 			</div>
 			<div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5'>
 				{DATACARDDAO.filter(
