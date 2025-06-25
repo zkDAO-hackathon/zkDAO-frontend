@@ -5,7 +5,7 @@ import { useState } from "react";
 import { CHAINS } from "@/app/helpers/list.chains";
 import Image from "next/image";
 import { FaCheck, FaCloudArrowUp, FaMinus, FaPlus } from "react-icons/fa6";
-import { FaArrowLeft, FaArrowRight, FaExclamationTriangle, FaPlusCircle } from "react-icons/fa";
+import { FaArrowLeft, FaArrowRight, FaExclamationTriangle, FaPaperPlane, FaPlusCircle } from "react-icons/fa";
 import { Address } from "viem";
 
 const CreateDaoForm = () => {
@@ -70,6 +70,13 @@ const CreateDaoForm = () => {
 		}
 	};
 
+	const onSubmit = (data: IDAO) => {
+		console.log("Form submitted with data:", {
+			...data,
+			tokenRecipients: temporalRecipients,
+		});
+	};
+
 	return (
 		<div>
 			<h1 className='text-3xl font-bold mb-6 text-center'>Create DAO</h1>
@@ -84,7 +91,7 @@ const CreateDaoForm = () => {
 				</ul>
 			</div>
 
-			<form onSubmit={handleSubmit((data) => console.log(data))} className='mx-auto container px-4 py-8'>
+			<form onSubmit={handleSubmit(onSubmit)} className='max-w-3xl mx-auto p-6 bg-base-100 rounded-lg shadow-md'>
 				{step === 1 && (
 					<>
 						<div className='flex flex-col gap-4 mb-6'>
@@ -244,7 +251,7 @@ const CreateDaoForm = () => {
 								placeholder='Enter Token Name'
 							/>
 							{errors.tokenName && (
-								<span className='text-error'>
+								<span className='text-error text-sm'>
 									<FaExclamationTriangle className='inline mr-2' />
 									The token name is required
 								</span>
@@ -263,85 +270,193 @@ const CreateDaoForm = () => {
 								placeholder='Enter Token Symbol'
 							/>
 							{errors.tokenSymbol && (
-								<span className='text-error'>
+								<span className='text-error text-sm'>
 									<FaExclamationTriangle className='inline mr-2' />
 									The token symbol is required
 								</span>
 							)}
 						</div>
 
-						{/* add the token recepients */}
 						<div className='flex flex-col gap-4 mb-6'>
-							<label htmlFor='tokenRecipients' className='text-2xl font-semibold'>
-								Token Recipients
-							</label>
+							<div className='flex justify-between items-center'>
+								<label htmlFor='tokenRecipients' className='text-2xl font-semibold'>
+									Token Recipients
+								</label>
+								{temporalRecipients.length > 0 && (
+									<span className='badge badge-primary p-3'>
+										{temporalRecipients.reduce((sum, recipient) => sum + recipient.amount, 0)}
+										{getValues("tokenSymbol") ? ` ${getValues("tokenSymbol")}` : " tokens"}
+									</span>
+								)}
+							</div>
 							<p className='text-gray-600 mb-2'>Add the addresses and amounts of the initial token distribution.</p>
-							<div className='flex gap-4'>
-								<input
-									type='text'
-									className='input input-border w-full'
-									placeholder='0x0000...000'
-									value={address}
-									onChange={(e) => setAddress(e.target.value as Address)}
-								/>
 
-								<div className='join border rounded-2xl border-base-300'>
-									<button
-										type='button'
-										className='join-item btn btn-ghost'
-										onClick={() => setNumTokens((prev: number) => Math.max(prev - 1, 0))}>
-										<FaMinus />
-									</button>
+							<div className='card bg-base-100 p-4 shadow-sm border border-base-200'>
+								<div className='flex flex-col md:flex-row gap-4'>
 									<input
 										type='text'
-										max={1000}
-										min={1}
-										maxLength={10}
-										className='input  join'
-										value={numTokens}
-										readOnly
-										placeholder='0'
-										onChange={(e) => setNumTokens(Number(e.target.value))}
+										className='input input-border w-full'
+										placeholder='0x0000...000'
+										value={address}
+										onChange={(e) => setAddress(e.target.value as Address)}
 									/>
+
+									<div className='join border rounded-2xl border-base-300'>
+										<button
+											type='button'
+											className='join-item btn btn-ghost'
+											onClick={() => setNumTokens((prev: number) => Math.max(prev - 1, 0))}>
+											<FaMinus />
+										</button>
+										<input
+											type='number'
+											max={1000}
+											min={1}
+											className='input join  text-center'
+											value={numTokens}
+											placeholder='0'
+											onChange={(e) => setNumTokens(Number(e.target.value))}
+										/>
+										<button
+											type='button'
+											className='join-item btn btn-ghost'
+											onClick={() => setNumTokens((prev: number) => Math.min(prev + 1, 1000))}>
+											<FaPlus />
+										</button>
+									</div>
 									<button
 										type='button'
-										className='join-item btn btn-ghost'
-										onClick={() => setNumTokens((prev: number) => Math.min(prev + 1, 1000))}>
-										<FaPlus />
+										className='btn btn-primary'
+										onClick={handleAddTemporalRecipients}
+										disabled={!address || numTokens <= 0}>
+										<FaPlusCircle className='mr-2' /> Add Recipient
 									</button>
 								</div>
-								<button type='button' className='btn btn-primary' onClick={handleAddTemporalRecipients}>
-									<FaPlusCircle />
-								</button>
 							</div>
+
 							{errors.tokenRecipients && (
 								<span className='text-error text-sm mt-1'>
-									{" "}
 									<FaExclamationTriangle className='inline mr-2' />
 									Token recipients are required
 								</span>
 							)}
+
 							{temporalRecipients.length > 0 && (
 								<div className='mt-4'>
 									<h3 className='text-lg font-semibold mb-2'>Current Recipients</h3>
-									<ul className='list-disc pl-5'>
+									<div className='grid gap-3'>
 										{temporalRecipients.map((recipient, index) => (
-											<li key={index} className='flex items-center gap-2 mb-1 shadow-sm p-4 rounded-2xl bg-base-100'>
-												<span className='font-medium'>{recipient.address}</span> -{" "}
-												<span className='text-sm text-gray-600'>
-													{recipient.amount} {getValues("tokenSymbol") || "Tokens"}
-												</span>
+											<div
+												key={index}
+												className='flex items-center gap-2 p-4 rounded-xl bg-base-100 shadow-sm border border-base-200 hover:shadow-md transition-all'>
+												<div className='flex-grow overflow-hidden'>
+													<div className='font-medium text-sm md:text-base truncate'>{recipient.address}</div>
+													<div className='text-sm text-gray-600'>
+														{recipient.amount} {getValues("tokenSymbol") || "Tokens"}
+													</div>
+												</div>
 												<button
 													type='button'
-													className='btn btn-error ml-auto'
+													className='btn btn-error btn-sm'
 													onClick={() => setTemporalRecipients((prev) => prev.filter((_, i) => i !== index))}>
 													<FaMinus />
 												</button>
-											</li>
+											</div>
 										))}
-									</ul>
+									</div>
 								</div>
 							)}
+
+							{temporalRecipients.length === 0 && (
+								<div className='text-center p-8 border border-dashed border-base-300 rounded-xl mt-4'>
+									<p className='text-gray-500'>No recipients added yet. Add your first token recipient above.</p>
+								</div>
+							)}
+						</div>
+					</>
+				)}
+				{step === 3 && (
+					<>
+						<div className='mb-8'>
+							<h3 className='text-2xl font-semibold mb-2'>Governance Timeline</h3>
+							<div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+								<div className='flex flex-col gap-2'>
+									<label htmlFor='date' className='text-lg font-medium'>
+										DAO Ending Date
+									</label>
+									<input type='date' {...register("date", { required: true })} id='date' className='input input-border w-full' />
+									{errors.date && (
+										<span className='text-error text-sm'>
+											<FaExclamationTriangle className='inline mr-2' />
+											Date is required
+										</span>
+									)}
+								</div>
+
+								<div className='flex flex-col gap-2'>
+									<label htmlFor='time' className='text-lg font-medium'>
+										DAO Ending Time
+									</label>
+									<input type='time' {...register("time", { required: true })} id='time' className='input input-border w-full' />
+									{errors.time && (
+										<span className='text-error text-sm'>
+											<FaExclamationTriangle className='inline mr-2' />
+											Time is required
+										</span>
+									)}
+								</div>
+							</div>
+						</div>
+
+						<div className='mb-8'>
+							<h3 className='text-2xl font-semibold mb-2'>Governance Parameters</h3>
+							<p className='text-gray-600 mb-4'>Configure the voting thresholds for your DAO governance.</p>
+
+							<div className='card p-5 mb-6'>
+								<label htmlFor='proposalThreshold' className='text-lg font-medium'>
+									Proposal Threshold
+								</label>
+								<p className='text-sm text-gray-500 mb-3'>Minimum percentage of tokens needed to submit a proposal.</p>
+								<div className='flex items-center gap-4'>
+									<input
+										type='range'
+										min={0}
+										max='100'
+										className='range range-primary flex-grow'
+										{...register("proposalThreshold", { required: true })}
+									/>
+									<div className='badge badge-primary text-lg p-3'>{watch("proposalThreshold") || 0}%</div>
+								</div>
+								{errors.proposalThreshold && (
+									<span className='text-error text-sm mt-2 block'>
+										<FaExclamationTriangle className='inline mr-2' />
+										Proposal threshold is required
+									</span>
+								)}
+							</div>
+
+							<div className='card  p-5'>
+								<label htmlFor='quorumFraction' className='text-lg font-medium'>
+									Quorum Fraction
+								</label>
+								<p className='text-sm text-gray-500 mb-3'>Minimum percentage of tokens that must participate for a vote to pass.</p>
+								<div className='flex items-center gap-4'>
+									<input
+										type='range'
+										min={0}
+										max='100'
+										className='range range-primary flex-grow'
+										{...register("quorumFraction", { required: true })}
+									/>
+									<div className='badge badge-primary text-lg p-3'>{watch("quorumFraction") || 0}%</div>
+								</div>
+								{errors.quorumFraction && (
+									<span className='text-error text-sm mt-2 block'>
+										<FaExclamationTriangle className='inline mr-2' />
+										Quorum fraction is required
+									</span>
+								)}
+							</div>
 						</div>
 					</>
 				)}
@@ -359,7 +474,8 @@ const CreateDaoForm = () => {
 							Next <FaArrowRight className='inline ml-2' />
 						</button>
 					) : (
-						<button type='submit' className='btn btn-success ml-auto'>
+						<button type='submit' className='btn btn-success ml-auto btn-lg'>
+							<FaPaperPlane className='inline mr-2' />
 							Create DAO
 						</button>
 					)}
