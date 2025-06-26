@@ -10,8 +10,7 @@ export interface IDAO {
 	tokenRecipients: ITokenRecipients[];
 
 	//step 3
-	date: Date;
-	time: string;
+	timeToVote: ITimeToVote;
 	proposalThreshold: number;
 	quorumFraction: number;
 }
@@ -19,4 +18,10 @@ export interface IDAO {
 export interface ITokenRecipients {
 	address: Address | string;
 	amount: number;
+}
+
+export interface ITimeToVote {
+	days: number;
+	hours: number;
+	minutes: number;
 }
