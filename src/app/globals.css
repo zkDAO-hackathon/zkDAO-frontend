@@ -69,9 +69,36 @@
 	transform: translateX(0) scale(1) rotate(0);
 }
 
-/* ::view-transition-old(page-create-dao) {
-	animation: slideOutRight 0.4s ease forwards;
+/* page dao */
+::view-transition-old(page-dao),
+::view-transition-new(page-dao) {
+	transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.4s ease;
+	transform-origin: center center;
+	border-radius: 16px;
 }
-::view-transition-new(page-create-dao) {
-	animation: slideInLeft 0.4s ease forwards;
-} */
+
+::view-transition-old(page-dao) {
+	opacity: 1;
+	/* transform: scale(1) translateY(0); */
+}
+
+::view-transition-new(page-dao) {
+	opacity: 1;
+	/* transform: scale(1); */
+	animation: expand-card 0.5s ease forwards;
+}
+
+@keyframes expand-card {
+	0% {
+		transform: scale(0.7) translateY(40px);
+		opacity: 0.5;
+	}
+	50% {
+		transform: scale(0.85) translateY(20px);
+		opacity: 0.8;
+	}
+	100% {
+		transform: scale(1) translateY(0);
+		opacity: 1;
+	}
+}
