@@ -26,7 +26,7 @@ const CreateDaoForm = () => {
 
 	const step2Fields = ["tokenName", "tokenSymbol"] as const;
 
-	const step3Fields = ["date", "time", "proposalThreshold", "quorumFraction"] as const;
+	const step3Fields = ["timeToVote", "proposalThreshold", "quorumFraction"] as const;
 
 	const handleNextStep = async () => {
 		const fieldsToValidate: (keyof IDAO)[] = [];
@@ -379,31 +379,76 @@ const CreateDaoForm = () => {
 					<>
 						<div className='mb-8'>
 							<h3 className='text-2xl font-semibold mb-2'>Governance Timeline</h3>
-							<div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
-								<div className='flex flex-col gap-2'>
-									<label htmlFor='date' className='text-lg font-medium'>
-										DAO Ending Date
+							<div className='grid grid-cols-1 '>
+								<div className='card bg-base-100 p-5 border border-base-200 shadow-sm'>
+									<label htmlFor='timeToVote' className='text-lg font-bold mb-2'>
+										Time for Voting
 									</label>
-									<input type='date' {...register("date", { required: true })} id='date' className='input input-border w-full' />
-									{errors.date && (
-										<span className='text-error text-sm'>
-											<FaExclamationTriangle className='inline mr-2' />
-											Date is required
-										</span>
-									)}
-								</div>
+									{/* <p className='text-sm text-gray-500 mb-4'>Set how long proposals will remain open for voting.</p> */}
 
-								<div className='flex flex-col gap-2'>
-									<label htmlFor='time' className='text-lg font-medium'>
-										DAO Ending Time
-									</label>
-									<input type='time' {...register("time", { required: true })} id='time' className='input input-border w-full' />
-									{errors.time && (
-										<span className='text-error text-sm'>
-											<FaExclamationTriangle className='inline mr-2' />
-											Time is required
-										</span>
-									)}
+									<div className='grid grid-cols-3 gap-4'>
+										<div className='flex flex-col'>
+											<div className='input-group text-center'>
+												<input
+													type='number'
+													min='0'
+													max='59'
+													className='input input-bordered w-full text-center'
+													placeholder='0'
+													{...register("timeToVote.minutes", {
+														required: true,
+														min: 0,
+														max: 59,
+														valueAsNumber: true,
+													})}
+												/>
+												<span className='label-text text-center w-full mt-2'>Minutes</span>
+											</div>
+											{errors?.timeToVote?.minutes && (
+												<span className='text-error text-xs mt-1'>Valid minutes required (0-59)</span>
+											)}
+										</div>
+
+										<div className='flex flex-col'>
+											<div className='input-group text-center'>
+												<input
+													type='number'
+													min='0'
+													max='23'
+													className='input input-bordered w-full text-center'
+													placeholder='0'
+													{...register("timeToVote.hours", {
+														required: true,
+														min: 0,
+														max: 23,
+														valueAsNumber: true,
+													})}
+												/>
+												<span className='label-text text-center w-full mt-2'>Hours</span>
+											</div>
+											{errors?.timeToVote?.hours && (
+												<span className='text-error text-xs mt-1'>Valid hours required (0-23)</span>
+											)}
+										</div>
+
+										<div className='flex flex-col'>
+											<div className='input-group text-center'>
+												<input
+													type='number'
+													min='0'
+													className='input input-bordered w-full text-center'
+													placeholder='0'
+													{...register("timeToVote.days", {
+														required: true,
+														min: 0,
+														valueAsNumber: true,
+													})}
+												/>
+												<span className='label-text text-center w-full mt-2'>Days</span>
+											</div>
+											{errors?.timeToVote?.days && <span className='text-error text-xs mt-1'>Valid days required</span>}
+										</div>
+									</div>
 								</div>
 							</div>
 						</div>
