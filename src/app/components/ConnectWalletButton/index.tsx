@@ -1,3 +1,3 @@
 export default function ConnectButton() {
-	return <appkit-button balance='hide' size='xxl' />;
+	return <appkit-button balance='hide' />;
 }
