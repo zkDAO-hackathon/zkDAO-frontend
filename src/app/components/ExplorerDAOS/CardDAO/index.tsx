@@ -7,7 +7,7 @@ const CardDAO = (props: CardDAOProps) => {
 	return (
 		<Link href={`/dao/${props.daoId || props.daoName}`} className='block w-full'>
 			<ViewTransition name='page-dao'>
-				<div className='card bg-base-100 shadow-sm hover:shadow-lg transition-all duration-300 h-full'>
+				<div className='card bg-white shadow-sm hover:shadow-lg transition-all duration-300 h-full rounded-2xl'>
 					<div className='card-body p-6'>
 						<div className='flex items-center gap-4 mb-3'>
 							<div className='relative w-12 h-12 overflow-hidden rounded-full ring-2 ring-primary/20'>
