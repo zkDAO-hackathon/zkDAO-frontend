@@ -35,7 +35,7 @@ const BoxDAOS = () => {
 	};
 
 	return (
-		<div className='mx-auto container px-4 py-8'>
+		<div className='mx-auto container px-4 py-8 relative'>
 			<h2 className='text-3xl font-bold mb-4'>Explore</h2>
 			<div className='flex items-center gap-4 mb-6'>
 				<label className='input input-border rounded-full w-full '>
