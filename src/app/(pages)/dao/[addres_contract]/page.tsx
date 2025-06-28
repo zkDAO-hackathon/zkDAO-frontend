@@ -77,7 +77,6 @@ const DashboardPage = () => {
 									]}
 								/>
 							</div>
-							<Assets />
 						</div>
 						<div>
 							<ContractInfo
@@ -85,6 +84,7 @@ const DashboardPage = () => {
 								daoAddress={"0x993351f1315d5123231FDFe0020f106FC460E14E"}
 								launchedDate={"June 2025"}
 							/>
+							<Assets />
 						</div>
 					</div>
 				</div>
