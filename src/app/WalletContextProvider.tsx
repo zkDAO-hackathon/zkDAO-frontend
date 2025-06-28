@@ -31,7 +31,7 @@ export const modal = createAppKit({
 	features: {
 		analytics: false,
 	},
-	themeMode: "light",
+	themeMode: "dark",
 });
 
 function ContextProvider({ children, cookies }: { children: ReactNode; cookies: string | null }) {
