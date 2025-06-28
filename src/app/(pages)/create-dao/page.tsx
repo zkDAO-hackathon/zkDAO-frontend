@@ -1,6 +1,5 @@
 "use client";
 import CreateDaoForm from "@/app/components/CreateDaoForm";
-import Navbar from "@/app/components/Navbar";
 import { useAccount } from "wagmi";
 import Image from "next/image";
 import SVG404V2 from "@/app/assets/404-v2.svg";
@@ -12,7 +11,6 @@ const CreateDaoPage = () => {
 	if (!isConnected) {
 		return (
 			<main>
-				<Navbar />
 				<div className='text-center mt-10'>
 					<Image src={SVG404V2} alt='Connect Wallet' width={500} height={150} className='mx-auto mb-4' />
 					<h1 className='text-2xl font-bold'>Please connect your wallet to create a DAO</h1>
@@ -23,7 +21,6 @@ const CreateDaoPage = () => {
 
 	return (
 		<>
-			<Navbar />
 			<ViewTransition name='page-create-dao'>
 				<CreateDaoForm />
 			</ViewTransition>
