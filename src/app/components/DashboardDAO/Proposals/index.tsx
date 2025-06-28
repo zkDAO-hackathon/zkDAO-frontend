@@ -1,3 +1,5 @@
+import CardProposals from "./CardProposals";
+
 interface ProposalsProps {
 	proposals: {
 		id: string;
@@ -11,91 +13,55 @@ interface ProposalsProps {
 }
 const Proposals = ({ proposals }: ProposalsProps) => {
 	return (
-		<div className='flex flex-col p-4'>
-			<h1 className='text-2xl font-bold mb-4'>Governance Proposals</h1>
-
-			<div className='tabs tabs-bordered mt-6'>
+		<div className='flex flex-col'>
+			<div className='tabs tabs-bordered'>
 				<input type='radio' name='proposal_tabs' className='tab' aria-label='Active proposals' defaultChecked />
-				<div className='tab-content p-4'>
+				<div className='tab-content'>
 					{proposals.filter((p) => p.status === "active").length === 0 ? (
 						<p className='text-gray-600'>No active proposals available.</p>
 					) : (
-						<div className='grid gap-4 md:grid-cols-2'>
+						<div className='flex flex-col gap-4'>
 							{proposals
 								.filter((p) => p.status === "active")
 								.map((proposal) => (
-									<div key={proposal.id} className='card bg-white shadow-md rounded-2xl p-6 hover:shadow-lg transition-shadow'>
-										<div className='flex justify-between items-start'>
-											<h2 className='font-bold text-lg'>{proposal.title}</h2>
-											<span className='badge badge-success'>Active</span>
-										</div>
-										<p className='my-3 text-gray-700 line-clamp-3'>{proposal.description}</p>
-										<div className='text-sm text-gray-500'>Created: {new Date(proposal.createdAt).toLocaleDateString()}</div>
-										<div className='mt-3'>
-											<div className='flex justify-between mb-1 text-sm font-medium'>
-												<span>For: {proposal.votesFor}</span>
-												<span>Against: {proposal.votesAgainst}</span>
-											</div>
-											<div className='w-full bg-gray-200 rounded-full h-2.5'>
-												<div
-													className='bg-green-600 h-2.5 rounded-full'
-													style={{
-														width: `${(
-															(proposal.votesFor / (proposal.votesFor + proposal.votesAgainst || 1)) *
-															100
-														).toFixed(0)}%`,
-													}}></div>
-											</div>
-										</div>
-										<button className='mt-4 w-full btn btn-sm btn-outline'>View details</button>
-									</div>
+									<CardProposals
+										key={proposal.id}
+										status={proposal.status}
+										name={proposal.title}
+										description={proposal.description}
+										by={`Created by DAO on ${new Date(proposal.createdAt).toLocaleDateString()}`}
+										timePublished={proposal.createdAt}
+									/>
 								))}
 						</div>
 					)}
 				</div>
 
 				<input type='radio' name='proposal_tabs' className='tab' aria-label='Closed proposals' />
-				<div className='tab-content p-4'>
+				<div className='tab-content'>
 					{proposals.filter((p) => p.status === "closed").length === 0 ? (
 						<p className='text-gray-600'>No closed proposals available.</p>
 					) : (
-						<div className='grid gap-4 md:grid-cols-2'>
+						<div className='flex flex-col gap-4'>
 							{proposals
 								.filter((p) => p.status === "closed")
 								.map((proposal) => (
-									<div key={proposal.id} className='card bg-white shadow-md rounded-2xl p-6'>
-										<div className='flex justify-between items-start'>
-											<h2 className='font-bold text-lg'>{proposal.title}</h2>
-											<span className='badge badge-neutral'>Closed</span>
-										</div>
-										<p className='my-3 text-gray-700'>{proposal.description}</p>
-										<div className='mt-3'>
-											<div className='flex justify-between mb-1'>
-												<span>For: {proposal.votesFor}</span>
-												<span>Against: {proposal.votesAgainst}</span>
-											</div>
-											<div className='w-full bg-gray-200 rounded-full h-2.5'>
-												<div
-													className={`h-2.5 rounded-full ${
-														proposal.votesFor > proposal.votesAgainst ? "bg-green-600" : "bg-red-600"
-													}`}
-													style={{
-														width: `${(
-															(proposal.votesFor / (proposal.votesFor + proposal.votesAgainst || 1)) *
-															100
-														).toFixed(0)}%`,
-													}}></div>
-											</div>
-										</div>
-									</div>
+									<CardProposals
+										key={proposal.id}
+										status={proposal.status}
+										name={proposal.title}
+										description={proposal.description}
+										by={`Created by DAO on ${new Date(proposal.createdAt).toLocaleDateString()}`}
+										timePublished={proposal.createdAt}
+									/>
 								))}
 						</div>
 					)}
 				</div>
 
 				<input type='radio' name='proposal_tabs' className='tab' aria-label='Create proposal' />
-				<div className='tab-content p-4'>
-					<div className='max-w-lg mx-auto bg-white rounded-xl shadow-md p-6'>
+				<div className='tab-content'>
+					<div className=' mx-auto bg-white rounded-xl shadow-md p-6'>
 						<h3 className='font-bold text-xl mb-4'>Create New Proposal</h3>
 						<form className='space-y-4'>
 							<div>
