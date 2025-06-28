@@ -7,6 +7,7 @@ import Image from "next/image";
 import { FaCheck, FaCloudArrowUp, FaMinus, FaPlus } from "react-icons/fa6";
 import { FaArrowLeft, FaArrowRight, FaExclamationTriangle, FaPaperPlane, FaPlusCircle } from "react-icons/fa";
 import { Address } from "viem";
+import { toast } from "sonner";
 
 const CreateDaoForm = () => {
 	const [step, setStep] = useState(1);
@@ -56,7 +57,7 @@ const CreateDaoForm = () => {
 			return;
 		}
 		if (address === "0x0000000000000000000000000000000000000000") {
-			alert("Please enter a valid address.");
+			toast.error("Please enter a valid address.");
 			return;
 		}
 		if (address && numTokens > 0) {
@@ -71,6 +72,10 @@ const CreateDaoForm = () => {
 	};
 
 	const onSubmit = (data: IDAO) => {
+		if (temporalRecipients.length === 0) {
+			toast.error("Please add at least one token recipient before submitting.");
+			return;
+		}
 		console.log("Form submitted with data:", {
 			...data,
 			tokenRecipients: temporalRecipients,
@@ -91,7 +96,7 @@ const CreateDaoForm = () => {
 				</ul>
 			</div>
 
-			<form onSubmit={handleSubmit(onSubmit)} className='max-w-3xl mx-auto p-6 bg-base-100 rounded-lg shadow-md'>
+			<form onSubmit={handleSubmit(onSubmit)} className='max-w-3xl mx-auto p-6 '>
 				{step === 1 && (
 					<>
 						<div className='flex flex-col gap-4 mb-6'>
@@ -115,11 +120,11 @@ const CreateDaoForm = () => {
 										/>
 										<label
 											htmlFor={chain.id}
-											className={`flex items-center p-4 rounded-2xl border transition-all duration-200 cursor-pointer
+											className={`flex items-center p-4 rounded-2xl border shadow-sm transition-all duration-200 cursor-pointer
                                                 ${
 													watch("chain") === chain.id
 														? "bg-primary/10 border-primary shadow-sm"
-														: "bg-base-200 border-base-300 hover:bg-base-300"
+														: "bg-white border-base-300 hover:bg-base-300"
 												}`}>
 											<div className='flex items-center w-full gap-3'>
 												<div className='flex-shrink-0'>
@@ -133,7 +138,7 @@ const CreateDaoForm = () => {
 												</div>
 												<div className='flex flex-col'>
 													<span className='font-medium'>{chain.name}</span>
-													{chain.isTesnet && <span className='text-xs text-error'>Testnet</span>}
+													{chain.isTestnet && <span className='text-xs text-error'>Testnet</span>}
 												</div>
 												<div className='ml-auto'>
 													{watch("chain") === chain.id && (
@@ -163,7 +168,7 @@ const CreateDaoForm = () => {
 								type='text'
 								{...register("daoName", { required: true })}
 								id='daoName'
-								className='input input-border w-full'
+								className='input input-border w-full bg-white'
 								placeholder='Enter DAO Name'
 							/>
 							{errors.daoName && (
@@ -179,7 +184,11 @@ const CreateDaoForm = () => {
 							<label htmlFor='daoDescription' className='text-2xl font-semibold'>
 								DAO Description
 							</label>
-							<textarea {...register("daoDescription", { required: true })} className='textarea w-full' placeholder='DAO Description' />
+							<textarea
+								{...register("daoDescription", { required: true })}
+								className='textarea w-full bg-white'
+								placeholder='DAO Description'
+							/>
 							{errors.daoDescription && (
 								<span className='text-error text-sm mt-1'>
 									{" "}
@@ -247,7 +256,7 @@ const CreateDaoForm = () => {
 								type='text'
 								{...register("tokenName", { required: true })}
 								id='tokenName'
-								className='input input-border w-full'
+								className='input input-border w-full bg-white '
 								placeholder='Enter Token Name'
 							/>
 							{errors.tokenName && (
@@ -266,7 +275,7 @@ const CreateDaoForm = () => {
 								type='text'
 								{...register("tokenSymbol", { required: true })}
 								id='tokenSymbol'
-								className='input input-border w-full'
+								className='input input-border w-full bg-white '
 								placeholder='Enter Token Symbol'
 							/>
 							{errors.tokenSymbol && (
@@ -291,11 +300,11 @@ const CreateDaoForm = () => {
 							</div>
 							<p className='text-gray-600 mb-2'>Add the addresses and amounts of the initial token distribution.</p>
 
-							<div className='card bg-base-100 p-4 shadow-sm border border-base-200'>
+							<div className='card bg-white p-4 shadow-sm border border-base-200'>
 								<div className='flex flex-col md:flex-row gap-4'>
 									<input
 										type='text'
-										className='input input-border w-full'
+										className='input input-border w-full bg-white '
 										placeholder='0x0000...000'
 										value={address}
 										onChange={(e) => setAddress(e.target.value as Address)}
@@ -312,7 +321,7 @@ const CreateDaoForm = () => {
 											type='number'
 											max={1000}
 											min={1}
-											className='input join  text-center'
+											className='input join  bg-white text-center'
 											value={numTokens}
 											placeholder='0'
 											onChange={(e) => setNumTokens(Number(e.target.value))}
@@ -380,7 +389,7 @@ const CreateDaoForm = () => {
 						<div className='mb-8'>
 							<h3 className='text-2xl font-semibold mb-2'>Governance Timeline</h3>
 							<div className='grid grid-cols-1 '>
-								<div className='card bg-base-100 p-5 border border-base-200 shadow-sm'>
+								<div className='card bg-white p-5 border border-base-200 shadow-sm'>
 									<label htmlFor='timeToVote' className='text-lg font-bold mb-2'>
 										Time for Voting
 									</label>
@@ -393,7 +402,7 @@ const CreateDaoForm = () => {
 													type='number'
 													min='0'
 													max='59'
-													className='input input-bordered w-full text-center'
+													className='input input-bordered w-full text-center bg-white '
 													placeholder='0'
 													{...register("timeToVote.minutes", {
 														required: true,
@@ -415,7 +424,7 @@ const CreateDaoForm = () => {
 													type='number'
 													min='0'
 													max='23'
-													className='input input-bordered w-full text-center'
+													className='input input-bordered w-full text-center bg-white '
 													placeholder='0'
 													{...register("timeToVote.hours", {
 														required: true,
@@ -436,7 +445,7 @@ const CreateDaoForm = () => {
 												<input
 													type='number'
 													min='0'
-													className='input input-bordered w-full text-center'
+													className='input input-bordered w-full text-center bg-white '
 													placeholder='0'
 													{...register("timeToVote.days", {
 														required: true,
@@ -508,7 +517,7 @@ const CreateDaoForm = () => {
 
 				<div className='flex justify-between gap-4 mt-6'>
 					{step > 1 && (
-						<button type='button' className='btn btn-secondary btn-lg' onClick={handlePreviousStep}>
+						<button type='button' className='btn btn-neutral btn-lg' onClick={handlePreviousStep}>
 							<FaArrowLeft className='inline mr-2' />
 							Back
 						</button>
