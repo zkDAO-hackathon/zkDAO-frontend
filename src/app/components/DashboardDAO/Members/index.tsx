@@ -1,6 +1,8 @@
 import { BlockieOptions } from "ethereum-blockies";
 // import { useAccount } from "wagmi";
 import Blockies from "react-blockies";
+import { FaWallet } from "react-icons/fa6";
+import { openModal } from "@/app/helpers/actions.modal";
 
 const Members = () => {
 	// Unused but kept for future use
@@ -28,9 +30,20 @@ const Members = () => {
 			} as BlockieOptions,
 		},
 	];
+
+	const handleDelegateClick = () => {
+		openModal("delegate-modal");
+	};
+
 	return (
 		<div className='flex flex-col gap-4 bg-white p-6 rounded-2xl shadow-md hover:shadow-lg transition-shadow duration-300 mt-6'>
-			<h2 className='text-2xl font-bold'>Members</h2>
+			<div className='flex items-center justify-between mb-4'>
+				<h2 className='text-2xl font-bold'>Members</h2>
+				<button className='btn btn-primary mb-4' onClick={handleDelegateClick}>
+					<FaWallet className='inline mr-2' />
+					Delegate
+				</button>
+			</div>
 			<p className='text-gray-600'>List of members in the DAO.</p>
 			<div className='mt-4'>
 				{accounts.length > 0 ? (
