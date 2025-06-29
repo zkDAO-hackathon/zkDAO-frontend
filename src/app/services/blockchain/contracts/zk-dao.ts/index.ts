@@ -1,12 +1,13 @@
 import {
   Address,
+  Hex,
   WalletClient,
   createPublicClient,
   getContract,
   http,
 } from "viem";
 import { ZKDAO_JSON } from "@/app/config/const";
-import { Dao, DaoStruct } from "@/app/modals";
+import { CheckUpkeep, Dao, DaoStruct } from "@/app/modals";
 import { avalancheFuji, sepolia } from "viem/chains";
 import { GovernorContract } from "../governor";
 
@@ -62,6 +63,24 @@ export class ZkDaoContract {
   //        READ METHODS
   // =========================
 
+  async checkUpkeep(): Promise<CheckUpkeep | null> {
+    try {
+      const contract = this.getReadContract();
+      const checkUpkeep = (await contract.read.checkUpkeep([""])) as [
+        boolean,
+        Hex
+      ];
+
+      return {
+        upkeepNeeded: checkUpkeep[0],
+        performData: checkUpkeep[1],
+      };
+    } catch (error) {
+      console.error("❌", error);
+      return null;
+    }
+  }
+
   async getDaoCounter(): Promise<number> {
     try {
       const contract = this.getReadContract();
@@ -78,7 +97,14 @@ export class ZkDaoContract {
       const contract = this.getReadContract();
       const dto = (await contract.read.getDao([BigInt(id)])) as DaoStruct;
 
-      return mapDaoStructToDao(dto);
+      const governor = new GovernorContract(this.network, dto.governor);
+      const proposals = await governor.getProposals();
+      const dao = mapDaoStructToDao(dto);
+
+      return {
+        ...dao,
+        proposals,
+      };
     } catch (error) {
       console.error("❌", error);
       return null;
@@ -92,22 +118,11 @@ export class ZkDaoContract {
       const daoPromises = [];
       for (let i = 1; i <= counter; i++) {
         const daoPromise = this.getDao(i);
-
         daoPromises.push(daoPromise);
       }
 
       const daos = await Promise.all(daoPromises);
-      const filteredDaos = daos.filter((dao): dao is Dao => dao !== null);
-      const daosWithProposals = await Promise.all(
-        filteredDaos.map(async (dao) => {
-          const governor = new GovernorContract(this.network, dao.governor);
-          return {
-            ...dao,
-            proposals: await governor.getProposals(),
-          };
-        })
-      );
-      return daosWithProposals;
+      return daos.filter((dao): dao is Dao => dao !== null);
     } catch (error) {
       console.error("❌", error);
       return [];
@@ -129,5 +144,6 @@ function mapDaoStructToDao(dto: DaoStruct): Dao {
     name: dto.name,
     description: dto.description,
     logo: dto.logo,
+    proposals: [],
   };
 }

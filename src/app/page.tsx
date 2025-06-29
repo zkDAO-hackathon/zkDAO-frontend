@@ -5,17 +5,26 @@ import ExplorerDAOS from "./components/ExplorerDAOS";
 
 import Footer from "./components/Footer";
 import Navbar from "./components/Navbar";
-import { useStore } from "@/store";
+import { useStore } from "@/app/store";
 import { useEffect } from "react";
 
 export default function Home() {
   const { chainId } = useAccount();
-  const { daos, fetchingDaos, getDaos, setNetwork } = useStore();
+  const {
+    checkUpkeep,
+    fetchingCheckUpkeep,
+    daos,
+    fetchingDaos,
+    queuedProposals,
+    getCheckUpkeep,
+    getDaos,
+    setNetwork,
+  } = useStore();
 
   useEffect(() => {
     const fetchData = async () => {
       if (daos.length === 0) {
-        await getDaos();
+        await Promise.all([getCheckUpkeep(), getDaos()]);
       }
     };
 
@@ -25,9 +34,17 @@ export default function Home() {
     }
   }, [chainId]);
 
-  if (fetchingDaos) return <div>Loading DAOs...</div>;
+  if (fetchingDaos && fetchingCheckUpkeep) return <div>Loading DAOs...</div>;
 
-  if (daos.length !== 0) console.log("DAOs:", daos);
+  if (daos.length !== 0)
+    console.log(
+      "DAOs:",
+      daos,
+      "Queued Proposals:",
+      queuedProposals,
+      "Check Upkeep:",
+      checkUpkeep
+    );
 
   return (
     <>

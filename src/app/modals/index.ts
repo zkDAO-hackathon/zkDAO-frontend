@@ -1,4 +1,4 @@
-import { Address } from "viem";
+import { Address, Hex } from "viem";
 
 export interface DaoStruct {
   id: bigint;
@@ -22,7 +22,7 @@ export interface Dao {
   name: string;
   description: string;
   logo: string;
-  proposals?: Proposal[];
+  proposals: Proposal[];
 }
 
 export interface ProposalStruct {
@@ -67,4 +67,9 @@ export interface Tally {
   againstVotes: string;
   forVotes: string;
   abstainVotes: string;
+}
+
+export interface CheckUpkeep {
+  upkeepNeeded: boolean;
+  performData: Hex;
 }
