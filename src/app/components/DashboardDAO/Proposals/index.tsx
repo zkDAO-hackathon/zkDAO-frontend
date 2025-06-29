@@ -1,3 +1,4 @@
+import Link from "next/link";
 import CardProposals from "./CardProposals";
 
 interface ProposalsProps {
@@ -9,6 +10,7 @@ interface ProposalsProps {
 		createdAt: string;
 		votesFor: number;
 		votesAgainst: number;
+		daoId: string;
 	}[];
 }
 const Proposals = ({ proposals }: ProposalsProps) => {
@@ -24,20 +26,24 @@ const Proposals = ({ proposals }: ProposalsProps) => {
 							{proposals
 								.filter((p) => p.status === "active")
 								.map((proposal) => (
-									<CardProposals
-										key={proposal.id}
-										status={proposal.status}
-										name={proposal.title}
-										description={proposal.description}
-										by={`Created by DAO on ${new Date(proposal.createdAt).toLocaleDateString()}`}
-										timePublished={proposal.createdAt}
-									/>
+									<>
+										<Link href={`/dao/${proposal.daoId}/proposals/${proposal.id}`} key={proposal.id} className='no-underline'>
+											<CardProposals
+												key={proposal.id}
+												status={proposal.status}
+												name={proposal.title}
+												description={proposal.description}
+												by={`Created by DAO on ${new Date(proposal.createdAt).toLocaleDateString()}`}
+												timePublished={proposal.createdAt}
+											/>
+										</Link>
+									</>
 								))}
 						</div>
 					)}
 				</div>
 
-				<input type='radio' name='proposal_tabs' className='tab' aria-label='Closed proposals' />
+				{/* <input type='radio' name='proposal_tabs' className='tab' aria-label='Closed proposals' />
 				<div className='tab-content'>
 					{proposals.filter((p) => p.status === "closed").length === 0 ? (
 						<p className='text-gray-600'>No closed proposals available.</p>
@@ -57,9 +63,9 @@ const Proposals = ({ proposals }: ProposalsProps) => {
 								))}
 						</div>
 					)}
-				</div>
+				</div> */}
 
-				<input type='radio' name='proposal_tabs' className='tab' aria-label='Create proposal' />
+				{/* <input type='radio' name='proposal_tabs' className='tab' aria-label='Create proposal' />
 				<div className='tab-content'>
 					<div className=' mx-auto bg-white rounded-xl shadow-md p-6'>
 						<h3 className='font-bold text-xl mb-4'>Create New Proposal</h3>
@@ -80,7 +86,7 @@ const Proposals = ({ proposals }: ProposalsProps) => {
 							</button>
 						</form>
 					</div>
-				</div>
+				</div> */}
 			</div>
 		</div>
 	);
