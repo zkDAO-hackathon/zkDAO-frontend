@@ -3,6 +3,7 @@ import Assets from "@/app/components/DashboardDAO/Assets";
 import ContractInfo from "@/app/components/DashboardDAO/ContractInfo";
 import HeroDAO from "@/app/components/DashboardDAO/HeroDAO";
 import Members from "@/app/components/DashboardDAO/Members";
+import ModalDelegateTokens from "@/app/components/DashboardDAO/ModalDelegateTokens";
 import Proposals from "@/app/components/DashboardDAO/Proposals";
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -56,6 +57,7 @@ const DashboardPage = () => {
 											createdAt: "2025-06-01",
 											votesFor: 100,
 											votesAgainst: 50,
+											daoId: contr as string,
 										},
 										{
 											id: "2",
@@ -65,6 +67,7 @@ const DashboardPage = () => {
 											createdAt: "2025-06-02",
 											votesFor: 200,
 											votesAgainst: 75,
+											daoId: contr as string,
 										},
 										{
 											id: "3",
@@ -74,6 +77,7 @@ const DashboardPage = () => {
 											createdAt: "2025-06-03",
 											votesFor: 150,
 											votesAgainst: 30,
+											daoId: contr as string,
 										},
 									]}
 								/>
@@ -87,6 +91,7 @@ const DashboardPage = () => {
 							/>
 							<Assets />
 							<Members />
+							<ModalDelegateTokens />
 						</div>
 					</div>
 				</div>
