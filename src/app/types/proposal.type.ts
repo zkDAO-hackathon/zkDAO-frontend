@@ -1,12 +1,12 @@
 import { Address } from "viem";
 
 export interface IProposal {
-	title: string;
+	title?: string;
 	description: string;
-	state: ProposalState;
-	encodedFunctionData: string;
+	state?: ProposalState;
+	encodedFunctionData?: string;
 	targets: Address[];
-	values: string;
+	values: bigint[];
 }
 
 enum ProposalState {
