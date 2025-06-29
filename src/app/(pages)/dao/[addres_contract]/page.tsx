@@ -2,6 +2,7 @@
 import Assets from "@/app/components/DashboardDAO/Assets";
 import ContractInfo from "@/app/components/DashboardDAO/ContractInfo";
 import HeroDAO from "@/app/components/DashboardDAO/HeroDAO";
+import Members from "@/app/components/DashboardDAO/Members";
 import Proposals from "@/app/components/DashboardDAO/Proposals";
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -85,6 +86,7 @@ const DashboardPage = () => {
 								launchedDate={"June 2025"}
 							/>
 							<Assets />
+							<Members />
 						</div>
 					</div>
 				</div>
