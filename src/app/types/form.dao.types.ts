@@ -7,6 +7,8 @@ export interface IDAO {
 	//step 2
 	tokenName: string;
 	tokenSymbol: string;
+
+	//
 	tokenRecipients: ITokenRecipients[];
 
 	//step 3
@@ -24,4 +26,27 @@ export interface ITimeToVote {
 	days: number;
 	hours: number;
 	minutes: number;
+}
+
+// transaction for create
+
+export interface GovernorTokenParams {
+	name: string;
+	symbol: string;
+}
+
+export interface GovernorParams {
+	name: string;
+	votingDelay: number;
+	votingPeriod: number;
+	proposalThreshold: number;
+	quorumFraction: number;
+}
+
+export interface To {
+	address: Address;
+}
+
+export interface Amounts {
+	amount: bigint;
 }
