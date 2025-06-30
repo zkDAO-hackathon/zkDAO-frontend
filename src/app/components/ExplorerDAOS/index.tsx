@@ -1,14 +1,18 @@
 import HeroLanding from "../HeroLanding";
 import BoxDAOS from "./BoxDAOS";
 import QuequedProposal from "./QuequedDAO";
+import { useStore } from "@/app/store";
+
 const ExplorerDAOS = () => {
-  return (
-    <>
-      <HeroLanding />
-      <QuequedProposal />
-      <BoxDAOS />
-    </>
-  );
+	const { queuedProposals } = useStore();
+
+	return (
+		<>
+			<HeroLanding />
+			{queuedProposals.length > 0 && <QuequedProposal />}
+			<BoxDAOS />
+		</>
+	);
 };
 
 export default ExplorerDAOS;
