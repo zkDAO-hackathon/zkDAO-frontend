@@ -2,9 +2,10 @@ import { Address } from "viem";
 export interface CardDAOProps {
 	daoName: string;
 	daoDescription: string;
-	daoAddresses: Address[] | string[];
+	token: Address;
 	daoLogo: string;
-	daoChain: string;
-	daoChainId: string;
+	governor: Address;
+	creator: Address;
 	daoId: string;
+	createdAt?: Date;
 }
