@@ -1,23 +1,26 @@
 "use client";
 import Image from "next/image";
 import { IoMdPaper } from "react-icons/io";
-import { HiMiniUserGroup } from "react-icons/hi2";
-import { PiTreasureChestFill } from "react-icons/pi";
+// import { HiMiniUserGroup } from "react-icons/hi2";
+// import { PiTreasureChestFill } from "react-icons/pi";
 
 interface HeroDAOProps {
 	name: string;
 	description: string;
 	logoUrl: string;
 	className?: string;
+	numProposals?: number;
+	numMembers?: number;
+	treasuryBalance?: string;
 }
 
-const HeroDAO = ({ name, description, logoUrl, className = "" }: HeroDAOProps) => {
+const HeroDAO = ({ name, description, logoUrl, className = "", numProposals }: HeroDAOProps) => {
 	return (
 		<section className={` ${className}`}>
 			<div className='flex flex-col md:flex-row items-start md:items-center gap-6 bg-white shadow-md rounded-2xl p-6'>
 				<div className='flex-shrink-0'>
 					<Image
-						src={logoUrl}
+						src={(logoUrl as string).trimEnd()}
 						alt={`${name} logo`}
 						width={80}
 						height={80}
@@ -35,11 +38,11 @@ const HeroDAO = ({ name, description, logoUrl, className = "" }: HeroDAOProps) =
 					</div>
 				</div>
 			</div>
-			<div className='grid grid-cols-1 md:grid-cols-3 gap-6 mt-8'>
+			<div className='grid grid-cols-1 gap-6 mt-8'>
 				{[
-					{ icon: <IoMdPaper className='text-blue-500 text-3xl' />, title: "Proposals", value: "0" },
-					{ icon: <HiMiniUserGroup className='text-green-500 text-3xl' />, title: "Members", value: "0" },
-					{ icon: <PiTreasureChestFill className='text-amber-500 text-3xl' />, title: "Treasury", value: "0 ETH" },
+					{ icon: <IoMdPaper className='text-blue-500 text-3xl' />, title: "Proposals", value: numProposals },
+					// { icon: <HiMiniUserGroup className='text-green-500 text-3xl' />, title: "Members", value: numMembers },
+					// { icon: <PiTreasureChestFill className='text-amber-500 text-3xl' />, title: "Treasury", value: treasuryBalance || "0 ETH" },
 				].map((item, index) => (
 					<div
 						key={index}
