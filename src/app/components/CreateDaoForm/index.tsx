@@ -1,5 +1,5 @@
 "use client";
-import { IDAO, ITokenRecipients } from "@/app/types/form.dao.types";
+import { GovernorParams, GovernorTokenParams, IDAO, ITokenRecipients } from "@/app/types/form.dao.types";
 import { useForm } from "react-hook-form";
 import { useState } from "react";
 import { CHAINS } from "@/app/helpers/list.chains";
@@ -8,12 +8,25 @@ import { FaCheck, FaCloudArrowUp, FaMinus, FaPlus } from "react-icons/fa6";
 import { FaArrowLeft, FaArrowRight, FaExclamationTriangle, FaPaperPlane, FaPlusCircle } from "react-icons/fa";
 import { Address } from "viem";
 import { toast } from "sonner";
+import { ZkDaoContract } from "@/app/services/blockchain/contracts/zk-dao.ts/";
+import { useWalletClient, useAccount } from "wagmi";
+import { useRouter } from "next/navigation";
+import { ZKDAO_JSON } from "@/app/config/const";
+import { GovernorContract } from "@/app/services/blockchain/contracts/governor";
 
 const CreateDaoForm = () => {
+	const router = useRouter();
+	const [isSending, setIsSending] = useState(false);
+	const { data: walletClient } = useWalletClient();
 	const [step, setStep] = useState(1);
 	const [numTokens, setNumTokens] = useState(0);
 	const [address, setAddress] = useState<Address>();
-	// This state is
+	const { chainId } = useAccount();
+	const network = chainId === 11155111 ? "sepolia" : "avalancheFuji";
+	const governor = new GovernorContract(network, ZKDAO_JSON.address as `0x${string}`, walletClient);
+
+	const zkContract = new ZkDaoContract(network, walletClient);
+
 	const [temporalRecipients, setTemporalRecipients] = useState<ITokenRecipients[]>([]);
 	const {
 		register,
@@ -22,6 +35,7 @@ const CreateDaoForm = () => {
 		watch,
 		trigger,
 		getValues,
+		reset,
 	} = useForm<IDAO>();
 	const step1Fields = ["chain", "daoName", "daoDescription", "logo"] as const;
 
@@ -43,6 +57,14 @@ const CreateDaoForm = () => {
 
 		if (isStepValid) {
 			setStep((prevStep) => prevStep + 1);
+		}
+	};
+
+	const handleFinalStep = async () => {
+		const isStepValid = await trigger(step3Fields);
+
+		if (isStepValid) {
+			handleSubmit(onSubmit)();
 		}
 	};
 
@@ -72,13 +94,60 @@ const CreateDaoForm = () => {
 	};
 
 	const onSubmit = (data: IDAO) => {
+		setIsSending(true);
 		if (temporalRecipients.length === 0) {
 			toast.error("Please add at least one token recipient before submitting.");
 			return;
 		}
-		console.log("Form submitted with data:", {
-			...data,
-			tokenRecipients: temporalRecipients,
+		const governor_tokenParams: GovernorTokenParams = {
+			name: data.tokenName,
+			symbol: data.tokenSymbol,
+		};
+
+		const governor_params: GovernorParams = {
+			name: data.daoName,
+			votingDelay: 1,
+			votingPeriod: data.timeToVote.days * 24 * 60 + data.timeToVote.hours * 60 + data.timeToVote.minutes,
+			proposalThreshold: data.proposalThreshold,
+			quorumFraction: data.quorumFraction,
+		};
+
+		const to: Address[] = [];
+		const amounts: bigint[] = [];
+
+		temporalRecipients.forEach((recipient) => {
+			to.push(recipient.address as Address);
+			amounts.push(BigInt(recipient.amount));
+		});
+		const amount = BigInt(1000000000000000);
+
+		toast.promise(governor.approveLink(amount, ZKDAO_JSON.address as `0x${string}`), {
+			loading: "Approving LINK...",
+			success: () => {
+				console.log("✅ LINK approved successfully");
+				toast.promise(zkContract.createDao(governor_tokenParams, governor_params, to, amounts, amount), {
+					loading: "Creating DAO...",
+					success: () => {
+						setStep(1);
+						setTemporalRecipients([]);
+						reset();
+						setIsSending(false);
+						router.push(`/`);
+						return "DAO created successfully!";
+					},
+					error: () => {
+						setIsSending(false);
+
+						return "Failed to create DAO.";
+					},
+				});
+				return "LINK approved successfully!";
+			},
+			error: (error) => {
+				console.error("❌ Error approving LINK:", error);
+				setIsSending(false);
+				return "Failed to approve LINK.";
+			},
 		});
 	};
 
@@ -96,7 +165,7 @@ const CreateDaoForm = () => {
 				</ul>
 			</div>
 
-			<form onSubmit={handleSubmit(onSubmit)} className='max-w-3xl mx-auto p-6 '>
+			<form className='max-w-3xl mx-auto p-6 '>
 				{step === 1 && (
 					<>
 						<div className='flex flex-col gap-4 mb-6'>
@@ -528,7 +597,11 @@ const CreateDaoForm = () => {
 							Next <FaArrowRight className='inline ml-2' />
 						</button>
 					) : (
-						<button type='submit' className='btn btn-success ml-auto btn-lg'>
+						<button
+							type='button'
+							className='btn btn-success ml-auto btn-lg'
+							onClick={handleFinalStep}
+							disabled={isSending || !walletClient}>
 							<FaPaperPlane className='inline mr-2' />
 							Create DAO
 						</button>
