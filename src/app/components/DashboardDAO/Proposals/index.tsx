@@ -1,46 +1,35 @@
 import Link from "next/link";
 import CardProposals from "./CardProposals";
+import { Proposal } from "@/app/modals";
 
 interface ProposalsProps {
-	proposals: {
-		id: string;
-		title: string;
-		description: string;
-		status: "active" | "closed";
-		createdAt: string;
-		votesFor: number;
-		votesAgainst: number;
-		daoId: string;
-	}[];
+	id_dao?: string;
+	proposals: Proposal[];
 }
-const Proposals = ({ proposals }: ProposalsProps) => {
+const Proposals = ({ id_dao, proposals }: ProposalsProps) => {
 	return (
-		<div className='flex flex-col'>
-			<div className='tabs tabs-bordered'>
-				<input type='radio' name='proposal_tabs' className='tab' aria-label='Active proposals' defaultChecked />
-				<div className='tab-content'>
-					{proposals.filter((p) => p.status === "active").length === 0 ? (
-						<p className='text-gray-600'>No active proposals available.</p>
-					) : (
-						<div className='flex flex-col gap-4'>
-							{proposals
-								.filter((p) => p.status === "active")
-								.map((proposal) => (
-									<>
-										<Link href={`/dao/${proposal.daoId}/proposals/${proposal.id}`} key={proposal.id} className='no-underline'>
-											<CardProposals
-												key={proposal.id}
-												status={proposal.status}
-												name={proposal.title}
-												description={proposal.description}
-												by={`Created by DAO on ${new Date(proposal.createdAt).toLocaleDateString()}`}
-												timePublished={proposal.createdAt}
-											/>
-										</Link>
-									</>
-								))}
-						</div>
-					)}
+		<div className='flex flex-col py-4'>
+			<div className='tabs tabs-lift'>
+				<input type='radio' name='proposal_tabs' className='tab ' aria-label='Success proposals' defaultChecked />
+				<div className='tab-content bg-base-100 p-4'>
+					<div className='flex flex-col gap-4 h-96 overflow-y-auto'>
+						{proposals
+							.filter((p) => p.state === 3)
+							.map((proposal) => (
+								<>
+									<Link href={`/dao/${id_dao}/proposals/${proposal.proposalNumber}`} key={proposal.id} className='no-underline'>
+										<CardProposals
+											key={proposal.id}
+											status={proposal.state.toString()}
+											name={proposal.id.toString()}
+											description={proposal.description}
+											by={proposal.proposer}
+											timePublished={proposal.createdAt.toString()}
+										/>
+									</Link>
+								</>
+							))}
+					</div>
 				</div>
 
 				{/* <input type='radio' name='proposal_tabs' className='tab' aria-label='Closed proposals' />
