@@ -6,14 +6,25 @@ import { MdDateRange } from "react-icons/md";
 interface ContractInfoProps {
 	chain: string;
 	daoAddress: string;
-	launchedDate: string;
+	launchedDate: string | Date;
 }
+
+const blockchainExplorerUrl = (chain: string, address: string) => {
+	if (chain === "sepolia") {
+		return `https://sepolia.etherscan.io/address/${address}`;
+	} else if (chain === "fuji") {
+		return `https://testnet.snowtrace.io/address/${address}`;
+	} else {
+		return `https://${chain.toLowerCase()}.etherscan.io/address/${address}`;
+	}
+};
 
 const ContractInfo = ({ chain, daoAddress, launchedDate }: ContractInfoProps) => {
 	return (
 		<div className='card bg-white shadow-md rounded-2xl p-6 hover:shadow-lg transition-shadow duration-300'>
 			<div className='flex items-center gap-3 mb-5'>
 				<RiContractLine className='text-2xl text-primary' />
+
 				<h2 className='text-xl font-bold'>Contract Information</h2>
 			</div>
 
@@ -32,7 +43,7 @@ const ContractInfo = ({ chain, daoAddress, launchedDate }: ContractInfoProps) =>
 						<label className='text-sm font-bold text-gray-500'>DAO Address</label>
 					</div>
 					<a
-						href={`https://${chain === "Ethereum" ? "etherscan.io" : `${chain.toLowerCase()}.etherscan.io`}/address/${daoAddress}`}
+						href={blockchainExplorerUrl(chain, daoAddress)}
 						target='_blank'
 						rel='noopener noreferrer'
 						className='ml-7 font-semibold text-primary hover:text-primary-dark'>
@@ -45,7 +56,7 @@ const ContractInfo = ({ chain, daoAddress, launchedDate }: ContractInfoProps) =>
 						<MdDateRange className='text-xl text-gray-500' />
 						<label className='text-sm font-bold text-gray-500'>Launched Date</label>
 					</div>
-					<p className='text-gray-800 font-semibold ml-7'>{launchedDate}</p>
+					<p className='text-gray-800 font-semibold ml-7'>{new Date(launchedDate).toLocaleDateString()}</p>
 				</div>
 			</div>
 		</div>
