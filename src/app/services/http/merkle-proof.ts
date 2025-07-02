@@ -13,12 +13,12 @@ interface MerkleProof {
 export class MerkleProofAPIClient {
 	private baseUrl: string;
 
-	constructor(baseUrl: string = "http://186.119.111.152:4001") {
+	constructor(baseUrl: string = "https://merkle.kaiser-soft.com/") {
 		this.baseUrl = baseUrl;
 	}
 
 	async getMerkleProof(dao: string, proposalId: string, address: string): Promise<MerkleProof> {
-		const url = `http://186.119.111.152:4001/merkle-tree/getMerkleProof/${dao}/proposals/${proposalId}/${address}`;
+		const url = `https://merkle.kaiser-soft.com/merkle-tree/getMerkleProof/${dao}/proposals/${proposalId}/${address}`;
 		console.log(`🌐 Fetching Merkle proof from: ${url}`);
 
 		try {
@@ -46,7 +46,7 @@ export class MerkleProofAPIClient {
 	}
 
 	async generateMerkleTrees(proposals: string[]): Promise<{ cids: string }> {
-		const url = "http://localhost:3000/merkle-tree/generate-merkle-trees";
+		const url = "https://merkle.kaiser-soft.com/merkle-tree/generate-merkle-trees";
 		console.log(`🌐 Generating Merkle trees at: ${url}`);
 
 		try {
