@@ -1,6 +1,7 @@
 import { avalancheFuji, sepolia } from "viem/chains";
 import ZkDaoJson from "../../assets/json/contracts/ZKDAO.json";
 import GovernorJson from "../../assets/json/contracts/Governor.json";
+import GovernorTokenJson from "../../assets/json/contracts/GovernorToken.json";
 
 export const TOKENS = {
 	sepolia: {
@@ -67,3 +68,4 @@ export const RPCS = {
 
 export const ZKDAO_JSON = ZkDaoJson;
 export const GOVERNON_JSON = GovernorJson;
+export const GOVERNOR_TOKEN_JSON = GovernorTokenJson;
