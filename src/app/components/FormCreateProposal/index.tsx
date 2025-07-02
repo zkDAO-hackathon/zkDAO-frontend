@@ -38,7 +38,7 @@ const FormCreateProposal = () => {
 			toast.error("Amount must be greater than zero");
 			return;
 		}
-		toast.promise(governor.createProposal(address as `0x${string}`, data.description, amount), {
+		toast.promise(governor.createProposal(data.proposer as `0x${string}`, data.description, amount), {
 			loading: "Creating proposal...",
 			success: "Proposal created successfully",
 			error: "Error creating proposal",
@@ -56,7 +56,7 @@ const FormCreateProposal = () => {
 							<span className='label-text font-medium'>Proposer</span>
 							<span className='label-text-alt text-gray-500'>Your wallet address</span>
 						</label>
-						<input type='text' value={address || ""} readOnly className='input input-bordered w-full cursor-not-allowed' />
+						<input type='text' {...register("proposer", { required: true })} className='input input-bordered w-full' />
 						<span className='text-xs text-gray-500 mt-1'>Your wallet address that will propose this action</span>
 					</div>
 					<div className='form-control w-full'>
@@ -67,7 +67,7 @@ const FormCreateProposal = () => {
 						<textarea
 							{...register("description", {
 								required: "Description is required",
-								minLength: { value: 10, message: "Description should be at least 10 characters" },
+								minLength: { value: 2, message: "Description should be at least 2 characters" },
 							})}
 							placeholder='Explain what this proposal is about'
 							className='textarea textarea-bordered w-full min-h-[120px]'></textarea>
