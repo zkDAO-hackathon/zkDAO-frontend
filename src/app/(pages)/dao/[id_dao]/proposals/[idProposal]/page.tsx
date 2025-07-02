@@ -52,6 +52,7 @@ const PageProposal = () => {
 							tally={proposal.tally}
 							leftTime={proposal?.timeForVoting ? new Date(proposal.timeForVoting).toLocaleString() : "Unknown Time"}
 							address={proposal?.proposer || "0x0000000000000000000000000000000000000000"}
+							idProposal={idProposal as string}
 						/>
 					) : (
 						<>
