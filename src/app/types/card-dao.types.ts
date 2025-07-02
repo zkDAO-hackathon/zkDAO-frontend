@@ -9,3 +9,15 @@ export interface CardDAOProps {
 	daoId: string;
 	createdAt?: Date;
 }
+
+export interface DaoStruct {
+	id: bigint;
+	createdAt: bigint;
+	creator: Address;
+	token: Address;
+	timelock: Address;
+	governor: Address;
+	name: string;
+	description: string;
+	logo: string;
+}
