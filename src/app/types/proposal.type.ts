@@ -9,7 +9,7 @@ export interface IProposal {
 	values: bigint[];
 }
 
-enum ProposalState {
+export enum ProposalState {
 	Pending,
 	Active,
 	Canceled,
