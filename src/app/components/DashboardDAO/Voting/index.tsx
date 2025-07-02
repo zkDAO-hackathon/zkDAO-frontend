@@ -2,9 +2,11 @@ import { useState } from "react";
 import { FaPaperPlane } from "react-icons/fa";
 import { FaCircle, FaCircleCheck, FaCircleXmark } from "react-icons/fa6";
 import { Address } from "viem";
-import { useAccount } from "wagmi";
+import { useAccount, useWalletClient } from "wagmi";
 import VoteOption from "./Votings";
 import { Tally } from "@/app/modals/index";
+
+import { GovernorContract } from "@/app/services/blockchain/contracts/governor";
 
 interface VotingProps {
 	leftTime: string | number; // Time left for voting in seconds or a formatted string
@@ -14,6 +16,10 @@ interface VotingProps {
 const Voting = ({ leftTime, address, tally }: VotingProps) => {
 	const { address: accountAddress } = useAccount();
 	const [activeVoting, setActiveVoting] = useState<boolean>(false);
+	const { data: walletClient } = useWalletClient();
+
+	const network = chainId === 11155111 ? "sepolia" : "avalancheFuji";
+	const governor = new GovernorContract(network, ZKDAO_JSON.address as `0x${string}`, walletClient);
 
 	return (
 		<div className='flex flex-col gap-4'>
