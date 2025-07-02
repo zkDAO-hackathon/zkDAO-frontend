@@ -201,7 +201,7 @@ export class GovernorContract {
 		}
 	}
 
-	async castVoteZK(proposalId: number, amount: bigint) {
+	async castVoteZK(proposalId: number, amount: bigint, option: 0 | 1 | 2): Promise<void> {
 		try {
 			if (!this.walletClient) {
 				throw new Error("walletClient not set. Call setWalletClient() first.");
@@ -254,7 +254,7 @@ export class GovernorContract {
 				hash: hashedMessage,
 			});
 
-			const pubKeyBytes = pubKey.slice(2); // remove 0x
+			const pubKeyBytes = pubKey.slice(2);
 			const pubKeyX = pubKeyBytes.slice(0, 64);
 			const pubKeyY = pubKeyBytes.slice(64, 128);
 
@@ -278,7 +278,7 @@ export class GovernorContract {
 				_secret: merkleProof.secret,
 				_voter: getAddress(account.address),
 				_weight: merkleProof.weight.toString(),
-				_choice: 1,
+				_choice: option,
 				_snapshot_merkle_tree: merkleProof.snapshotMerkleTree,
 				_leaf: merkleProof.leaf,
 				_index: merkleProof.index.toString(),
