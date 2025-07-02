@@ -119,7 +119,7 @@ const CreateDaoForm = () => {
 			to.push(recipient.address as Address);
 			amounts.push(BigInt(recipient.amount));
 		});
-		const amount = BigInt(1000000000000000);
+		const amount = BigInt(5000000000000000000);
 
 		toast.promise(governor.approveLink(amount, ZKDAO_JSON.address as `0x${string}`), {
 			loading: "Approving LINK...",
