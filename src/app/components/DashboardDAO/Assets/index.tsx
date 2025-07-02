@@ -1,15 +1,25 @@
 import { PiPuzzlePieceFill } from "react-icons/pi";
 import { useTokenAssets } from "@/app/hooks/useTokensAssets";
 import Image from "next/image";
+import { FaWallet } from "react-icons/fa";
+import { openModal } from "@/app/helpers/actions.modal";
 
 const Assets = () => {
 	const { network, balances, loading } = useTokenAssets();
-
+	const handleDelegateClick = () => {
+		openModal("delegate-modal");
+	};
 	return (
 		<div className='flex flex-col gap-4 bg-white p-6 rounded-2xl shadow-md hover:shadow-lg transition-shadow duration-300'>
-			<div className='flex items-center gap-3 mb-4'>
-				<PiPuzzlePieceFill className='text-3xl text-primary' />
-				<h1 className='text-2xl font-bold'>DAO Assets</h1>
+			<div className='flex justify-between'>
+				<div className='flex items-center gap-3 mb-4'>
+					<PiPuzzlePieceFill className='text-3xl text-primary' />
+					<h1 className='text-2xl font-bold'>DAO Assets</h1>
+				</div>
+				<button className='btn btn-primary mb-4' onClick={handleDelegateClick}>
+					<FaWallet className='inline mr-2' />
+					Delegate
+				</button>
 			</div>
 
 			{network ? (
