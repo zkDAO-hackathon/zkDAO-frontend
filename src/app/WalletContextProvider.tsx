@@ -16,7 +16,7 @@ if (!projectId) {
 // Set up metadata
 const metadata = {
 	name: "zkDao",
-	description: "",
+	description: "esto es una prueba de AppKit",
 	url: "https://appkitexampleapp.com",
 	icons: ["https://avatars.githubusercontent.com/u/179229932"],
 };
@@ -26,11 +26,8 @@ export const modal = createAppKit({
 	adapters: [wagmiAdapter],
 	projectId,
 	networks: [sepolia, avalancheFuji],
+	metadata,
 
-	metadata: metadata,
-	features: {
-		analytics: false,
-	},
 	themeMode: "dark",
 });
 
