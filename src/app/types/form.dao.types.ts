@@ -13,6 +13,7 @@ export interface IDAO {
 
 	//step 3
 	timeToVote: ITimeToVote;
+	votingDelay: number;
 	proposalThreshold: number;
 	quorumFraction: number;
 }
