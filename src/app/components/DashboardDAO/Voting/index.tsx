@@ -8,6 +8,8 @@ import { Tally } from "@/app/modals/index";
 
 import { GovernorContract } from "@/app/services/blockchain/contracts/governor";
 import { ZKDAO_JSON } from "@/app/config/const";
+import { toast } from "sonner";
+import Modal from "../../Modal";
 
 interface VotingProps {
 	leftTime: string | number;
@@ -17,6 +19,13 @@ interface VotingProps {
 }
 const Voting = ({ leftTime, address, tally, idProposal }: VotingProps) => {
 	const { address: accountAddress, chainId } = useAccount();
+	const { statesOfTransaction, setStatesOfTransaction } = useState({
+		pinData: false,
+		prepareTx: false,
+		signTx: false,
+		confirmTx: false,
+		indexOnchain: false,
+	});
 	const [activeVoting, setActiveVoting] = useState<boolean>(false);
 	const { data: walletClient } = useWalletClient();
 	const [vote, setVote] = useState<0 | 1 | 2 | null>(null);
@@ -29,16 +38,23 @@ const Voting = ({ leftTime, address, tally, idProposal }: VotingProps) => {
 			console.error("No account address or proposal ID found");
 			return;
 		}
-		try {
-			// Convert idProposal to number and use appropriate amount value
-			const proposalId = Number(idProposal);
-			const amount = BigInt(1); // Replace with appropriate token amount
 
-			await governor.castVoteZK(proposalId, amount, voteType);
-			console.log(`Vote cast successfully: ${voteType}`);
-		} catch (error) {
-			console.error("Error casting vote:", error);
-		}
+		const proposalId = Number(idProposal);
+		const amount = BigInt(1);
+
+		toast.promise(governor.castVoteZK(proposalId, amount, voteType), {
+			loading: "Casting vote...",
+			success: () => {
+				setActiveVoting(false);
+				setVote(null);
+
+				return "Vote cast successfully";
+			},
+			error: (error) => {
+				console.error("Error casting vote:", error);
+				return `Error casting vote: ${error instanceof Error ? error.message : "Unknown error"}`;
+			},
+		});
 	};
 
 	const handleVoteClick = (voteType: 0 | 1 | 2) => {
@@ -136,6 +152,7 @@ const Voting = ({ leftTime, address, tally, idProposal }: VotingProps) => {
 						</div>
 					)}
 				</div>
+				<Modal id='voting-modal'></Modal>
 			</div>
 		</div>
 	);
