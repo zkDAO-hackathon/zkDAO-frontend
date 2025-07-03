@@ -25,15 +25,23 @@ export default function Home() {
 		}
 	}, [chainId]);
 
-	if (fetchingDaos && fetchingCheckUpkeep) return <div>Loading DAOs...</div>;
+	// if (fetchingDaos && fetchingCheckUpkeep) return <div>Loading DAOs...</div>;
 
 	if (daos.length !== 0) console.log("DAOs:", daos, "Queued Proposals:", queuedProposals, "Check Upkeep:", checkUpkeep);
 
 	return (
 		<>
 			<Navbar />
+			{fetchingDaos && fetchingCheckUpkeep ? (
+				// skeleton loading
+				<div className='flex items-center justify-center h-screen flex-col space-y-4'>
+					<span className='loading loading-infinity loading-xl'></span>
+					<span>Loading...</span>
+				</div>
+			) : (
+				<ExplorerDAOS />
+			)}
 
-			<ExplorerDAOS />
 			<Footer />
 		</>
 	);
