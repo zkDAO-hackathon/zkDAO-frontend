@@ -1,3 +1,4 @@
+"use client";
 import Modal from "../Modal";
 import { IProposal } from "@/app/types/proposal.type";
 import { useForm } from "react-hook-form";
@@ -7,8 +8,11 @@ import { GovernorContract } from "@/app/services/blockchain/contracts/governor";
 import { useAccount } from "wagmi";
 import { useWalletClient } from "wagmi";
 import { toast } from "sonner";
+import { closeModal } from "@/app/helpers/actions.modal";
+import { useState } from "react";
 
 const FormCreateProposal = () => {
+	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const { chainId, address } = useAccount();
 	const { data: walletClient } = useWalletClient();
 	const network = chainId === 11155111 ? "sepolia" : "avalancheFuji";
@@ -17,17 +21,21 @@ const FormCreateProposal = () => {
 		register,
 		handleSubmit,
 		formState: { errors },
+		reset,
 	} = useForm<IProposal>();
 
 	const onSubmit = (data: IProposal) => {
+		setIsLoading(true);
 		if (!walletClient) {
 			toast.error("Wallet client is not available");
+			setIsLoading(false);
 			return;
 		}
 
 		governor.setWalletClient(walletClient);
 
 		if (!address) {
+			setIsLoading(false);
 			toast.error("Wallet address is not available");
 			return;
 		}
@@ -35,13 +43,23 @@ const FormCreateProposal = () => {
 		// parse the amount to BigInt and ensure it's in wei
 		const amount = BigInt(data.amount || 0);
 		if (amount <= 0) {
+			setIsLoading(false);
 			toast.error("Amount must be greater than zero");
 			return;
 		}
-		toast.promise(governor.createProposal(data.proposer as `0x${string}`, data.description, amount), {
+		toast.promise(governor.createProposal(address, data.description, BigInt(amount)), {
 			loading: "Creating proposal...",
-			success: "Proposal created successfully",
-			error: "Error creating proposal",
+			success: () => {
+				reset();
+				closeModal("form-create-proposal");
+				setIsLoading(false);
+				window.location.reload();
+				return "Proposal created successfully";
+			},
+			error: () => {
+				setIsLoading(false);
+				return "Error creating proposal";
+			},
 		});
 	};
 
@@ -97,7 +115,7 @@ const FormCreateProposal = () => {
 					</div>
 
 					<div className='mt-6 flex justify-end gap-2'>
-						<button type='submit' className='btn btn-primary'>
+						<button type='submit' className='btn btn-primary' disabled={isLoading}>
 							Create Proposal
 						</button>
 					</div>
