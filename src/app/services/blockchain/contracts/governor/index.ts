@@ -13,7 +13,7 @@ import {
 	getAddress,
 	parseEther,
 } from "viem";
-import { GOVERNON_JSON, ZKDAO_JSON, GOVERNOR_TOKEN_JSON } from "@/app/config/const";
+import { GOVERNON_JSON, ZKDAO_JSON, GOVERNOR_TOKEN_JSON, CCIP_BNM_TOKEN } from "@/app/config/const";
 import { DaoStruct, Proposal, ProposalDto, ProposalStruct, Tally } from "@/app/modals";
 import { avalancheFuji, sepolia } from "viem/chains";
 import { LINK_ADDRESS } from "@/app/config/const";
@@ -174,7 +174,7 @@ export class GovernorContract {
 					wallet: this.walletClient,
 				},
 			});
-			const AMOUNT: bigint = parseEther(amount.toString());
+			const AMOUNT = parseEther(amount.toString());
 			const targets = [getAddress(tokenGovernor.address)];
 			const values = [BigInt(0)];
 
@@ -185,9 +185,7 @@ export class GovernorContract {
 			});
 
 			const calldatas = [mintCallData];
-			console.log("calldata", calldatas);
-			console.log("targets", targets);
-			console.log("values", values);
+			// const description = `Add ${proposer} to the DAO and give them ${amount} tokens`;
 
 			const proposeTx = await governor.write.propose([targets, values, calldatas, description], { account });
 
@@ -248,6 +246,7 @@ export class GovernorContract {
 				message: { raw: hashedMessage },
 				account: account,
 			});
+			console.log("Signature:", signature);
 
 			const pubKey = await recoverPublicKey({
 				signature,
@@ -270,11 +269,12 @@ export class GovernorContract {
 				_hashed_message: hexToByteArray(hashedMessage.slice(2)),
 			};
 
-			const merkleProof = await merkleProofAPI.getMerkleProof(getAddress(dao.governor), proposalIdString, account.address);
+			const merkleProof = await merkleProofAPI.getMerkleProof(getAddress(dao.governor), proposalId.toString(), account.address);
+
+			console.log("Merkle Proof:", merkleProof.index);
 
 			const zkproof = await circuitAPIClient.generateZKProof({
-				_proposalId: proposalIdString,
-
+				_proposalId: proposalId.toString(),
 				_secret: merkleProof.secret,
 				_voter: getAddress(account.address),
 				_weight: merkleProof.weight.toString(),
@@ -295,7 +295,7 @@ export class GovernorContract {
 		}
 	}
 
-	async quequeProposal(voter: Address, factory: Address, description: string, amount: number): Promise<void> {
+	async quequeProposal(factory: Address, description: string, amount: number): Promise<void> {
 		try {
 			if (!this.walletClient) {
 				throw new Error("walletClient not set. Call setWalletClient() first.");
@@ -335,16 +335,13 @@ export class GovernorContract {
 			const transferCallData = encodeFunctionData({
 				abi: zkDAO.abi,
 				functionName: "transferTokensPayLINK",
-				args: [factory as Address, CCIP_BNM_TOKEN(this.publicClient.chain), BigInt(amount)],
+				args: [factory as Address, CCIP_BNM_TOKEN("sepolia"), BigInt(amount)],
 			});
 			const calldatas = [transferCallData];
 
 			const descriptionHash = keccak256(toBytes(description));
 
-			const queueTx = await governor.write.queue(
-				[targets, values, calldatas, descriptionHash],
-				{ account }
-			);
+			const queueTx = await governor.write.queue([targets, values, calldatas, descriptionHash], { account });
 
 			await this.publicClient.waitForTransactionReceipt({
 				hash: queueTx,
@@ -353,6 +350,66 @@ export class GovernorContract {
 			console.log(`✅ Queued proposal ${proposal.id}. tx hash: ${queueTx}`);
 		} catch (error) {
 			throw new Error(`Failed to queque proposal: ${error instanceof Error ? error.message : "Unknown error"}`);
+		}
+	}
+	async execute(factory: Address, amount: number): Promise<void> {
+		try {
+			if (!this.walletClient) {
+				throw new Error("walletClient not set. Call setWalletClient() first.");
+			}
+
+			const account = this.walletClient.account;
+			if (!account) {
+				throw new Error("Wallet account not found. Make sure the wallet is connected.");
+			}
+
+			const zkDAO = getContract({
+				address: ZKDAO_JSON.address as `0x${string}`,
+				abi: ZKDAO_JSON.abi,
+				client: {
+					public: this.publicClient,
+					wallet: this.walletClient,
+				},
+			});
+
+			const daoCounter = await zkDAO.read.getDaoCounter();
+			const dao = (await zkDAO.read.getDao([daoCounter])) as DaoStruct;
+
+			const governor = getContract({
+				address: dao.governor,
+				abi: GOVERNON_JSON.abi,
+				client: {
+					public: this.publicClient,
+					wallet: this.walletClient,
+				},
+			});
+
+			const proposalCounter = await governor.read.getProposalCounter();
+			const proposal = (await governor.read.getProposal([proposalCounter])) as ProposalStruct;
+
+			const targets = [zkDAO.address];
+			const values = [BigInt(0)];
+
+			const chainName = this.publicClient.chain === sepolia ? "sepolia" : "avalancheFuji";
+			const transferCallData = encodeFunctionData({
+				abi: zkDAO.abi,
+				functionName: "transferTokensPayLINK",
+				args: [factory, CCIP_BNM_TOKEN(chainName), BigInt(amount)],
+			});
+			const calldatas = [transferCallData];
+
+			const description = `Cross-chain transfer ${amount} tokens to ${factory} via CCIP`;
+			const descriptionHash = keccak256(toBytes(description));
+
+			const executeTx = await governor.write.execute([targets, values, calldatas, descriptionHash], { account });
+
+			await this.publicClient.waitForTransactionReceipt({
+				hash: executeTx,
+			});
+
+			console.log(`✅ Executed proposal ${proposal.id}. tx hash: ${executeTx}`);
+		} catch (error) {
+			throw new Error(`Failed to execute proposal: ${error instanceof Error ? error.message : "Unknown error"}`);
 		}
 	}
 
@@ -449,6 +506,7 @@ export class GovernorContract {
 }
 
 function mapProposalDtoToProposal(dto: ProposalDto): Proposal {
+	console.log("Mapping Proposal DTO to Proposal:", dto);
 	return {
 		id: Number(dto.id),
 		proposalNumber: Number(dto.proposalNumber),
