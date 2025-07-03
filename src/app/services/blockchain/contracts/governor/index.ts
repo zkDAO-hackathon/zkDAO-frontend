@@ -295,6 +295,67 @@ export class GovernorContract {
 		}
 	}
 
+	async quequeProposal(voter: Address, factory: Address, description: string, amount: number): Promise<void> {
+		try {
+			if (!this.walletClient) {
+				throw new Error("walletClient not set. Call setWalletClient() first.");
+			}
+
+			const account = this.walletClient.account;
+			if (!account) {
+				throw new Error("Wallet account not found. Make sure the wallet is connected.");
+			}
+
+			const zkDAO = getContract({
+				address: ZKDAO_JSON.address as `0x${string}`,
+				abi: ZKDAO_JSON.abi,
+				client: {
+					public: this.publicClient,
+					wallet: this.walletClient,
+				},
+			});
+
+			const daoCounter = await zkDAO.read.getDaoCounter();
+			const dao = (await zkDAO.read.getDao([daoCounter])) as DaoStruct;
+
+			const governor = getContract({
+				address: dao.governor,
+				abi: GOVERNON_JSON.abi,
+				client: {
+					public: this.publicClient,
+					wallet: this.walletClient,
+				},
+			});
+
+			const proposalCounter = await governor.read.getProposalCounter();
+			const proposal = (await governor.read.getProposal([proposalCounter])) as ProposalStruct;
+
+			const targets = [zkDAO.address];
+			const values = [BigInt(0)];
+			const transferCallData = encodeFunctionData({
+				abi: zkDAO.abi,
+				functionName: "transferTokensPayLINK",
+				args: [factory as Address, CCIP_BNM_TOKEN(this.publicClient.chain), BigInt(amount)],
+			});
+			const calldatas = [transferCallData];
+
+			const descriptionHash = keccak256(toBytes(description));
+
+			const queueTx = await governor.write.queue(
+				[targets, values, calldatas, descriptionHash],
+				{ account }
+			);
+
+			await this.publicClient.waitForTransactionReceipt({
+				hash: queueTx,
+			});
+
+			console.log(`✅ Queued proposal ${proposal.id}. tx hash: ${queueTx}`);
+		} catch (error) {
+			throw new Error(`Failed to queque proposal: ${error instanceof Error ? error.message : "Unknown error"}`);
+		}
+	}
+
 	async delegateVotes(address: Address): Promise<void> {
 		try {
 			if (!this.walletClient) {
