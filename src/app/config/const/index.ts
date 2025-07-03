@@ -69,3 +69,15 @@ export const RPCS = {
 export const ZKDAO_JSON = ZkDaoJson;
 export const GOVERNON_JSON = GovernorJson;
 export const GOVERNOR_TOKEN_JSON = GovernorTokenJson;
+
+import { Address } from "viem";
+
+export const CCIP_BNM_TOKEN: (chain: string) => Address = (chain: string): Address => {
+	if (chain === "ethereumSepolia") {
+		return TOKENS.sepolia.CCIP_BNM.address as Address;
+	} else if (chain === "avalancheFuji") {
+		return TOKENS.fuji.CCIP_BNM.address as Address;
+	} else {
+		throw new Error(`Unsupported chain: ${chain}`);
+	}
+};
