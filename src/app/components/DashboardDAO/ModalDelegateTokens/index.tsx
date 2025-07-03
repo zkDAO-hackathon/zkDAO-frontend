@@ -1,3 +1,4 @@
+"use client";
 import Modal from "../../Modal";
 import { useForm } from "react-hook-form";
 import { IDelegateTokens } from "@/app/types/delegate.types";
@@ -5,12 +6,16 @@ import { toast } from "sonner";
 import { useAccount, useWalletClient } from "wagmi";
 import { ZKDAO_JSON } from "@/app/config/const";
 import { GovernorContract } from "@/app/services/blockchain/contracts/governor";
+import { closeModal } from "@/app/helpers/actions.modal";
+import { useState } from "react";
 
 const ModalDelegateTokens = () => {
+	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const {
 		register,
 		handleSubmit,
 		formState: { errors },
+		reset,
 	} = useForm<IDelegateTokens>();
 
 	const { chainId } = useAccount();
@@ -19,9 +24,15 @@ const ModalDelegateTokens = () => {
 	const governor = new GovernorContract(network, ZKDAO_JSON.address as `0x${string}`, walletClient);
 
 	const onSubmit = async (data: IDelegateTokens) => {
+		setIsLoading(true);
 		toast.promise(governor.delegateVotes(data.address as `0x${string}`), {
 			loading: "Delegating tokens...",
-			success: "Tokens delegated successfully",
+			success: () => {
+				setIsLoading(false);
+				closeModal("delegate-modal");
+				reset();
+				return "Tokens delegated successfully";
+			},
 			error: "Error delegating tokens",
 		});
 	};
@@ -74,7 +85,7 @@ const ModalDelegateTokens = () => {
 				</div>
 
 				<div className='flex gap-2 mt-4'>
-					<button type='submit' className='btn btn-primary flex-1'>
+					<button type='submit' className='btn btn-primary flex-1' disabled={isLoading}>
 						Delegate
 					</button>
 				</div>
