@@ -13,8 +13,8 @@ const CardDAO = (props: CardDAOProps) => {
 	const formattedDate = createdAt ? formatDistanceToNow(new Date(createdAt), { addSuffix: true }) : "N/A";
 
 	return (
-		<Link href={`/dao/${daoId || daoName}`} className='block w-full'>
-			<ViewTransition name='page-dao'>
+		<ViewTransition name='page-dao'>
+			<Link href={`/dao/${daoId || daoName}`} className='block w-full'>
 				<div className='card bg-white shadow-sm hover:shadow-lg transition-all duration-300 h-full rounded-2xl'>
 					<div className='card-body p-6'>
 						<div className='flex items-center justify-between mb-3'>
@@ -60,8 +60,8 @@ const CardDAO = (props: CardDAOProps) => {
 						</div>
 					</div>
 				</div>
-			</ViewTransition>
-		</Link>
+			</Link>
+		</ViewTransition>
 	);
 };
 
