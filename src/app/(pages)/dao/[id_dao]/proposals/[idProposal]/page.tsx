@@ -48,12 +48,14 @@ const PageProposal = () => {
 						Cast Your Vote
 					</h2>
 					{proposal?.state === 3 ? (
-						<Voting
-							tally={proposal.tally}
-							leftTime={proposal?.timeForVoting ? new Date(proposal.timeForVoting).toLocaleString() : "Unknown Time"}
-							address={proposal?.proposer || "0x0000000000000000000000000000000000000000"}
-							idProposal={idProposal as string}
-						/>
+						<>
+							<Voting
+								tally={proposal.tally}
+								leftTime={proposal?.timeForVoting.toISOString()}
+								address={proposal?.proposer || "0x0000000000000000000000000000000000000000"}
+								idProposal={idProposal as string}
+							/>
+						</>
 					) : (
 						<>
 							<Image src={SVG404} alt='Voting not active' className='mx-auto mb-4' width={200} height={200}></Image>
