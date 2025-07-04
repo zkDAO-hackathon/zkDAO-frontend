@@ -15,6 +15,7 @@ import { useStore } from "@/app/store";
 import { Address } from "viem";
 import { useAccount } from "wagmi";
 import { NETWORKS_BY_CHAIN_ID } from "@/app/config/const";
+import Breadcrumbs from "@/app/components/Breadcrumbs";
 
 const DashboardPage = () => {
 	const { getDao } = useStore();
@@ -50,6 +51,14 @@ const DashboardPage = () => {
 			<ViewTransition name='page-dao'>
 				<div className='container mx-auto p-4'>
 					<h1 className='text-2xl font-bold mb-4'>Dashboard</h1>
+					<Breadcrumbs
+						items={[
+							{ label: "Dashboard", href: "/" },
+							{ label: "DAO", href: `/dao/${id_dao}` },
+						]}
+					/>
+
+					{/* Hero Section */}
 					<div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
 						<div>
 							<HeroDAO
