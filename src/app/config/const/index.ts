@@ -53,17 +53,17 @@ export const NETWORKS_BY_CHAIN_ID: Record<number, keyof typeof TOKENS> = {
 
 export const CHAINS = {
 	sepolia,
-	avalanche: avalancheFuji,
+	fuji: avalancheFuji,
 } as const;
 
 export const LINK_ADDRESS = {
 	sepolia: "0x779877A7B0D9E8603169DdbD7836e478b4624789",
-	avalanche: "0x0b9d5D9136855f6FEc3c0993feE6E9CE8a297846",
+	fuji: "0x0b9d5D9136855f6FEc3c0993feE6E9CE8a297846",
 } as const;
 
 export const RPCS = {
 	sepolia: "https://eth-sepolia.g.alchemy.com/v2/UmqgPqCsA4TgEqnMvObDS",
-	avalanche: "https://avax-fuji.g.alchemy.com/v2/UmqgPqCsA4TgEqnMvObDS",
+	fuji: "https://avax-fuji.g.alchemy.com/v2/UmqgPqCsA4TgEqnMvObDS",
 };
 
 export const ZKDAO_JSON = ZkDaoJson;
