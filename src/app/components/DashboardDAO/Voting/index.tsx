@@ -93,12 +93,65 @@ const Voting = ({ leftTime, address, tally, idProposal }: VotingProps) => {
 			<div className='flex items-center justify-between'>
 				<div className='flex items-center gap-3'>
 					<span className='text-2xl' aria-label='Voting ballot'>
-						🗳️
+						🗳️ Time
 					</span>
-					<div>
+					{/* <div>
 						<p className='text-sm text-gray-500'>Time remaining</p>
 						<h3 className='text-md font-bold text-primary'>{leftTime}</h3>
-					</div>
+					</div> */}
+					<span className='countdown font-mono text-lg'>
+						{typeof leftTime === "number" && (
+							<>
+								{(() => {
+									const hours = Math.floor(leftTime / 3600);
+									const minutes = Math.floor((leftTime % 3600) / 60);
+									const seconds = leftTime % 60;
+
+									return (
+										<>
+											{hours > 0 && (
+												<>
+													<span
+														style={{ "--value": hours } as React.CSSProperties}
+														aria-live='polite'
+														aria-label={`${hours} hours`}>
+														{hours}
+													</span>
+													h{" "}
+												</>
+											)}
+
+											{minutes > 0 && (
+												<>
+													<span
+														style={{ "--value": minutes } as React.CSSProperties}
+														aria-live='polite'
+														aria-label={`${minutes} minutes`}>
+														{minutes}
+													</span>
+													m{" "}
+												</>
+											)}
+
+											{(hours === 0 && minutes === 0) || seconds > 0 ? (
+												<>
+													<span
+														style={{ "--value": seconds } as React.CSSProperties}
+														aria-live='polite'
+														aria-label={`${seconds} seconds`}>
+														{seconds}
+													</span>
+													s
+												</>
+											) : null}
+										</>
+									);
+								})()}
+							</>
+						)}
+
+						{typeof leftTime === "string" && <span aria-live='polite'>{leftTime}</span>}
+					</span>
 				</div>
 			</div>
 
