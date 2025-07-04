@@ -147,7 +147,7 @@ export class ZkDaoContract {
 					wallet: this.walletClient,
 				},
 			});
-			console.log("Network:", this.network);
+
 			const createDaoTx = await zkContract.write.payForDaoCreation([governorTokenParams, 0, governor_params, to, amounts, price], {
 				account,
 				chain: this.publicClient.chain,
