@@ -51,7 +51,7 @@ const PageProposal = () => {
 						<>
 							<Voting
 								tally={proposal.tally}
-								leftTime={proposal?.timeForVoting.toISOString()}
+								leftTime={proposal?.timeForVoting instanceof Date ? proposal.timeForVoting.getTime() : proposal?.timeForVoting}
 								address={proposal?.proposer || "0x0000000000000000000000000000000000000000"}
 								idProposal={idProposal as string}
 							/>
