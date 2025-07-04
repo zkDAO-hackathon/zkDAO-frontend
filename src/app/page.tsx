@@ -23,6 +23,7 @@ export default function Home() {
 			setNetwork(chainId === 11155111 ? "sepolia" : "fuji");
 			fetchData();
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [chainId]);
 
 	// if (fetchingDaos && fetchingCheckUpkeep) return <div>Loading DAOs...</div>;
