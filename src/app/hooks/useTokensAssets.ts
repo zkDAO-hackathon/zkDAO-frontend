@@ -25,7 +25,7 @@ export function useTokenAssets() {
 
 	const loadAssets = async () => {
 		if (!address || !chainId || !walletClient) return;
-
+		console.log(chainId);
 		const chainName = NETWORKS_BY_CHAIN_ID[chainId];
 		setNetwork(chainName);
 
@@ -52,6 +52,7 @@ export function useTokenAssets() {
 
 	useEffect(() => {
 		loadAssets();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [address, chainId, walletClient]);
 
 	return {
