@@ -6,6 +6,7 @@ import { openModal } from "@/app/helpers/actions.modal";
 
 const Assets = () => {
 	const { network, balances, loading } = useTokenAssets();
+
 	const handleDelegateClick = () => {
 		openModal("delegate-modal");
 	};
