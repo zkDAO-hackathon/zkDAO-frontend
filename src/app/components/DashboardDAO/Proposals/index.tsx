@@ -25,6 +25,9 @@ const Proposals = ({ id_dao, proposals }: ProposalsProps) => {
 											description={proposal.description}
 											by={proposal.proposer}
 											timePublished={proposal.createdAt.toString()}
+											timeLeft={
+												proposal?.timeForVoting instanceof Date ? proposal.timeForVoting.getTime() : proposal?.timeForVoting
+											}
 										/>
 									</Link>
 								</>
