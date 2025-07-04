@@ -9,7 +9,6 @@ import { Tally } from "@/app/modals/index";
 import { GovernorContract } from "@/app/services/blockchain/contracts/governor";
 import { ZKDAO_JSON } from "@/app/config/const";
 import { toast } from "sonner";
-import Modal from "../../Modal";
 
 interface VotingProps {
 	leftTime: string | number;
@@ -19,13 +18,13 @@ interface VotingProps {
 }
 const Voting = ({ leftTime, address, tally, idProposal }: VotingProps) => {
 	const { address: accountAddress, chainId } = useAccount();
-	const { statesOfTransaction, setStatesOfTransaction } = useState({
-		pinData: false,
-		prepareTx: false,
-		signTx: false,
-		confirmTx: false,
-		indexOnchain: false,
-	});
+	// const { statesOfTransaction, setStatesOfTransaction } = useState({
+	// 	pinData: false,
+	// 	prepareTx: false,
+	// 	signTx: false,
+	// 	confirmTx: false,
+	// 	indexOnchain: false,
+	// });
 	const [activeVoting, setActiveVoting] = useState<boolean>(false);
 	const { data: walletClient } = useWalletClient();
 	const [vote, setVote] = useState<0 | 1 | 2 | null>(null);
@@ -47,7 +46,25 @@ const Voting = ({ leftTime, address, tally, idProposal }: VotingProps) => {
 			success: () => {
 				setActiveVoting(false);
 				setVote(null);
-
+				toast.promise(governor.quequeProposal(accountAddress as Address, Number(amount)), {
+					loading: "Queuing proposal...",
+					success: () => {
+						toast.promise(governor.execute(accountAddress as Address, Number(amount)), {
+							loading: "Executing proposal...",
+							success: () => {
+								return "Proposal executed successfully";
+							},
+							error: (error) => {
+								return `Error executing proposal: ${error instanceof Error ? error.message : "Unknown error"}`;
+							},
+						});
+						return "Proposal queued successfully";
+					},
+					error: (error) => {
+						console.error("Error queuing proposal:", error);
+						return `Error queuing proposal: ${error instanceof Error ? error.message : "Unknown error"}`;
+					},
+				});
 				return "Vote cast successfully";
 			},
 			error: (error) => {
@@ -152,7 +169,6 @@ const Voting = ({ leftTime, address, tally, idProposal }: VotingProps) => {
 						</div>
 					)}
 				</div>
-				<Modal id='voting-modal'></Modal>
 			</div>
 		</div>
 	);
