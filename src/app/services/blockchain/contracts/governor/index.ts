@@ -189,9 +189,11 @@ export class GovernorContract {
 
 			const proposeTx = await governor.write.propose([targets, values, calldatas, description], { account });
 
-			await this.publicClient.waitForTransactionReceipt({
-				hash: proposeTx,
-			});
+			const receipt = await this.publicClient.waitForTransactionReceipt({ hash: proposeTx });
+
+			if (receipt.status !== "success") {
+				throw new Error(`Transaction failed with status: ${receipt.status}`);
+			}
 
 			return true;
 		} catch (error) {
@@ -240,7 +242,7 @@ export class GovernorContract {
 
 			const hashedMessage = keccak256(toBytes(`Add ${this.address} to the DAO and give them ${amount} tokens`));
 
-			const proposalIdString = (proposal.id as string | number | bigint).toString();
+			// const proposalIdString = (proposal.id as string | number | bigint).toString();
 
 			const signature = await this.walletClient.signMessage({
 				message: { raw: hashedMessage },
@@ -295,7 +297,7 @@ export class GovernorContract {
 		}
 	}
 
-	async quequeProposal(factory: Address, description: string, amount: number): Promise<void> {
+	async quequeProposal(factory: Address, amount: number): Promise<void> {
 		try {
 			if (!this.walletClient) {
 				throw new Error("walletClient not set. Call setWalletClient() first.");
@@ -338,6 +340,8 @@ export class GovernorContract {
 				args: [factory as Address, CCIP_BNM_TOKEN("sepolia"), BigInt(amount)],
 			});
 			const calldatas = [transferCallData];
+
+			const description = `Cross-chain transfer ${amount} tokens to ${factory} via CCIP`;
 
 			const descriptionHash = keccak256(toBytes(description));
 
@@ -476,7 +480,7 @@ export class GovernorContract {
 				throw new Error("Wallet account not found. Make sure the wallet is connected.");
 			}
 
-			const link_address = this.publicClient.chain === sepolia ? LINK_ADDRESS.sepolia : LINK_ADDRESS.avalanche;
+			const link_address = this.publicClient.chain === sepolia ? LINK_ADDRESS.sepolia : LINK_ADDRESS.fuji;
 
 			const linkContract = getContract({
 				address: link_address,
