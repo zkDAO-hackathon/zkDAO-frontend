@@ -11,6 +11,7 @@ import { Proposal } from "@/app/modals/index";
 import { MdOutlineRecentActors } from "react-icons/md";
 import { FaDatabase } from "react-icons/fa6";
 import { LuHexagon } from "react-icons/lu";
+import Breadcrumbs from "@/app/components/Breadcrumbs";
 
 const ProposalPage = () => {
 	const { getDao } = useStore();
@@ -32,6 +33,13 @@ const ProposalPage = () => {
 			<>
 				<div className='container mx-auto px-4 py-6'>
 					<div className='flex flex-col items-center justify-center h-full'>
+						<Breadcrumbs
+							items={[
+								{ label: "DAOs", href: "/" },
+								{ label: `DAO #${id_dao}`, href: `/dao/${id_dao}` },
+								{ label: "Proposals", href: `/dao/${id_dao}/proposals` },
+							]}
+						/>
 						<h1 className='text-2xl font-bold mb-4'>No Proposals Available</h1>
 						<p className='text-gray-600'>Create your first proposal to get started.</p>
 						<button className='btn btn-primary mt-4' onClick={() => openModal("form-create-proposal")}>
@@ -49,6 +57,13 @@ const ProposalPage = () => {
 		<div className='container mx-auto px-4 py-6'>
 			<div className='flex flex-col space-y-6'>
 				{/* Header section */}
+				<Breadcrumbs
+					items={[
+						{ label: "DAOs", href: "/" },
+						{ label: `DAO #${id_dao}`, href: `/dao/${id_dao}` },
+						{ label: "Proposals", href: `/dao/${id_dao}/proposals` },
+					]}
+				/>
 				<div className='flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4'>
 					<h1 className='text-2xl font-bold'>Proposals</h1>
 					<button className='btn btn-primary flex items-center gap-2' onClick={() => openModal("form-create-proposal")}>
