@@ -1,4 +1,5 @@
 import { ProposalState } from "@/app/types/proposal.type";
+import { useEffect, useState } from "react";
 interface CardProposalsProps {
 	status: number | string;
 	name: string;
@@ -21,8 +22,33 @@ const statusToState: Record<string, ProposalState> = {
 };
 
 const CardProposals = ({ status, name, description, by, timePublished, timeLeft }: CardProposalsProps) => {
-	// Get the enum value from the status string
 	const currentState = statusToState[status];
+	const [timeLeftState, setTimeLeftState] = useState<string | number>(Number(timeLeft));
+
+	useEffect(() => {
+		if (typeof timeLeft !== "number") {
+			setTimeLeftState(Number(timeLeft));
+			return;
+		}
+
+		let remaining = timeLeft;
+		const interval = setInterval(() => {
+			remaining -= 1000;
+
+			if (remaining <= 0) {
+				clearInterval(interval);
+				setTimeLeftState("Voting ended");
+			} else {
+				const totalSeconds = Math.floor(remaining / 1000);
+				const hours = Math.floor(totalSeconds / 3600);
+				const minutes = Math.floor((totalSeconds % 3600) / 60);
+				const seconds = totalSeconds % 60;
+				setTimeLeftState(`${hours > 0 ? `${hours}h ` : ""}${minutes > 0 ? `${minutes}m ` : ""}${seconds}s`);
+			}
+		}, 1000);
+
+		return () => clearInterval(interval);
+	}, [timeLeft]);
 
 	return (
 		<div className='card bg-white shadow-md rounded-2xl p-6 hover:shadow-lg transition-shadow duration-300'>
@@ -67,58 +93,9 @@ const CardProposals = ({ status, name, description, by, timePublished, timeLeft 
 				</div>
 				<div className='flex items-center gap-2 text-sm text-gray-500'>
 					<span>Time Left</span>
-					<span className='countdown font-mono text-lg'>
-						{typeof timeLeft === "number" && (
-							<>
-								{(() => {
-									const hours = Math.floor(timeLeft / 3600);
-									const minutes = Math.floor((timeLeft % 3600) / 60);
-									const seconds = timeLeft % 60;
 
-									return (
-										<>
-											{hours > 0 && (
-												<>
-													<span
-														style={{ "--value": hours } as React.CSSProperties}
-														aria-live='polite'
-														aria-label={`${hours} hours`}>
-														{hours}
-													</span>
-													h{" "}
-												</>
-											)}
-
-											{minutes > 0 && (
-												<>
-													<span
-														style={{ "--value": minutes } as React.CSSProperties}
-														aria-live='polite'
-														aria-label={`${minutes} minutes`}>
-														{minutes}
-													</span>
-													m{" "}
-												</>
-											)}
-
-											{(hours === 0 && minutes === 0) || seconds > 0 ? (
-												<>
-													<span
-														style={{ "--value": seconds } as React.CSSProperties}
-														aria-live='polite'
-														aria-label={`${seconds} seconds`}>
-														{seconds}
-													</span>
-													s
-												</>
-											) : null}
-										</>
-									);
-								})()}
-							</>
-						)}
-
-						{typeof timeLeft === "string" && <span aria-live='polite'>{timeLeft}</span>}
+					<span className='countdown font-mono text-lg' aria-live='polite'>
+						{timeLeftState}
 					</span>
 				</div>
 			</div>
