@@ -5,17 +5,20 @@ interface QueuedProposal {
 	id: bigint;
 	proposalNumber: number;
 	description: string;
-	state: number;
+	state?: number;
 	createdAt: Date;
 	timeLeft: string | number;
 }
 
 const CardQue = ({ proposalNumber, description, state, timeLeft }: QueuedProposal) => {
 	const [timeLeftState, setTimeLeftState] = useState<string>("");
-
+	console.log("State", state);
 	useEffect(() => {
 		const remainingMs = Number(timeLeft);
-		const targetTime = Date.now() + remainingMs;
+		let targetTime = Date.now() + remainingMs;
+		if (Number(timeLeft) < 1000) {
+			targetTime = Date.now() + 60000;
+		}
 
 		if (isNaN(remainingMs) || remainingMs <= 0) {
 			setTimeLeftState("Voting ended");
@@ -48,20 +51,30 @@ const CardQue = ({ proposalNumber, description, state, timeLeft }: QueuedProposa
 	}, [timeLeft]);
 
 	return (
-		<div className='bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-shadow duration-300 border border-gray-100'>
-			<div className='flex justify-between items-start mb-3'>
+		<div className='bg-white rounded-2xl border border-gray-200 p-6'>
+			<div className='flex justify-between items-start mb-4'>
 				<h2 className='text-xl font-semibold text-gray-800'>Proposal #{proposalNumber}</h2>
-				<span className='bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm font-medium flex-shrink-0'>{state}</span>
+				<span className='badge badge-ghost badge-lg text-gray-600'>
+					<div className='inline-grid *:[grid-area:1/1]'>
+						<div className='status status-primary animate-ping'></div>
+						<div className='status status-primary'></div>
+					</div>{" "}
+					In Queue
+				</span>
 			</div>
 
-			<div className='bg-gray-50 rounded-lg p-4 mb-3'>
-				<p className='text-gray-700 line-clamp-3'>{description}</p>
+			<div className='bg-gray-50 rounded-lg p-4 mb-4 hover:bg-gray-100 transition-colors duration-200'>
+				<p className='text-gray-700 line-clamp-2 text-ellipsis'>{description}</p>
 			</div>
 
-			<div>
-				<FaClock className='inline mr-2 text-gray-500' />
-				<span className='text-gray-500'>Time left: </span>
-				<span className='font-semibold'>{timeLeftState}</span>
+			<div className='flex items-center mt-2'>
+				<div className='bg-blue-100 p-2 rounded-full mr-3'>
+					<FaClock className='text-blue-600' />
+				</div>
+				<div>
+					<span className='text-sm text-gray-500 block'>Time left</span>
+					<span className='font-semibold text-gray-800'>{timeLeftState}</span>
+				</div>
 			</div>
 		</div>
 	);
