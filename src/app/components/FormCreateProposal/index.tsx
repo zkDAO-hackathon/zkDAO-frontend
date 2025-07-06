@@ -48,6 +48,7 @@ const FormCreateProposal = () => {
 			toast.error("Amount must be greater than zero");
 			return;
 		}
+		console.log("AMOUNT", parseEther(Number(amount).toString()));
 		toast.promise(governor.createProposal(address, data.description, parseEther(Number(amount).toString())), {
 			loading: "Creating proposal...",
 			success: () => {
