@@ -15,8 +15,8 @@ const Proposals = ({ id_dao, proposals }: ProposalsProps) => {
 					<div className='flex flex-col gap-4 h-96 overflow-y-auto'>
 						{proposals
 							.filter((p) => p.state === 3)
-							.map((proposal) => (
-								<>
+							.map((proposal, index) => (
+								<div key={index}>
 									<Link href={`/dao/${id_dao}/proposals/${proposal.proposalNumber}`} key={proposal.id} className='no-underline'>
 										<CardProposals
 											key={proposal.id}
@@ -30,7 +30,7 @@ const Proposals = ({ id_dao, proposals }: ProposalsProps) => {
 											}
 										/>
 									</Link>
-								</>
+								</div>
 							))}
 					</div>
 				</div>
