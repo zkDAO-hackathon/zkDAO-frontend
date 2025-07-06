@@ -8,6 +8,9 @@ import CardDAO from "../CardDAO";
 import { useRouter } from "next/navigation";
 import { unstable_ViewTransition as ViewTransition } from "react";
 import { useStore } from "@/app/store";
+import Image from "next/image";
+import PAISAJE from "@/app/assets/404-v3.svg";
+import { MdOutlineExplore } from "react-icons/md";
 
 const CardSkeleton = () => (
 	<div className='card bg-base-200 shadow-lg animate-pulse'>
@@ -64,7 +67,10 @@ const BoxDAOS = () => {
 
 	return (
 		<div className='mx-auto container px-4 py-8 relative'>
-			<h2 className='text-3xl font-bold mb-4'>Explore</h2>
+			<h2 className='text-3xl font-bold mb-4 items-center flex gap-2'>
+				<MdOutlineExplore />
+				Explore
+			</h2>
 			<div className='flex items-center gap-4 mb-6'>
 				<label className='input input-border rounded-full w-full '>
 					<FaSearch />
@@ -83,14 +89,24 @@ const BoxDAOS = () => {
 					  Array(6)
 							.fill(0)
 							.map((_, index) => <CardSkeleton key={index} />)
-					: // Show actual DAO cards when loaded
-					  daos
-							.filter(
+					: // Filter DAOs based on search query
+					  (() => {
+							const filteredDaos = daos.filter(
 								(dao) =>
 									dao.name.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) ||
 									dao.description.toLowerCase().includes(debouncedSearchQuery.toLowerCase())
-							)
-							.map((dao, index) => (
+							);
+
+							if (filteredDaos.length === 0) {
+								return (
+									<div className='col-span-full text-center py-10'>
+										<Image src={PAISAJE} alt='No DAOs found' className='mx-auto mb-4' width={200} height={200} />
+										<p className='text-lg text-gray-500'>No DAOs found. Try a different search or create a new DAO.</p>
+									</div>
+								);
+							}
+
+							return filteredDaos.map((dao, index) => (
 								<CardDAO
 									key={index}
 									daoName={dao.name}
@@ -101,7 +117,8 @@ const BoxDAOS = () => {
 									creator={dao.creator}
 									daoId={dao.id.toString()}
 								/>
-							))}
+							));
+					  })()}
 			</div>
 		</div>
 	);
