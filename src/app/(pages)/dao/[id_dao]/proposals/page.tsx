@@ -12,6 +12,8 @@ import { MdOutlineRecentActors } from "react-icons/md";
 import { FaDatabase } from "react-icons/fa6";
 import { LuHexagon } from "react-icons/lu";
 import Breadcrumbs from "@/app/components/Breadcrumbs";
+import ZKDAO_LOGO from "@/app/assets/zkDAOLogo.svg";
+import Image from "next/image";
 
 const ProposalPage = () => {
 	const { getDao } = useStore();
@@ -28,6 +30,31 @@ const ProposalPage = () => {
 			});
 		}
 	}, [id_dao, getDao]);
+	const [loading, setLoading] = useState(true);
+
+	useEffect(() => {
+		if (id_dao) {
+			setLoading(true);
+			getDao(Number(id_dao)).then((dao) => {
+				if (dao) {
+					setProposals(dao.proposals || []);
+				}
+				setLoading(false);
+			});
+		}
+	}, [id_dao, getDao]);
+
+	if (loading) {
+		return (
+			<div className='container mx-auto px-4 py-6 flex items-center justify-center h-[50vh]'>
+				<div className='flex flex-col items-center'>
+					<Image src={ZKDAO_LOGO} alt='zkDAO Logo' width={100} height={100} className='animate-pulse' />
+					<p className='mt-4 text-gray-600'>Loading proposals...</p>
+				</div>
+			</div>
+		);
+	}
+
 	if (proposals.length === 0) {
 		return (
 			<>
@@ -139,7 +166,7 @@ const ProposalPage = () => {
 								<div key={index} className='rounded-2xl border border-gray-200 p-4 flex flex-col hover:shadow-md transition-shadow'>
 									<div className='flex items-center gap-3 mb-2'>
 										<div className='p-2 bg-base-100 rounded-full'>{item.icon}</div>
-										<span className='text-lg font-semibold'>{item.value}</span>
+										<span className='text-lg font-semibold truncate mask-ellipse'>{item.value}</span>
 									</div>
 									<span className='text-sm text-gray-600'>{item.label}</span>
 								</div>
