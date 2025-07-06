@@ -29,7 +29,7 @@ const VoteOption = ({ emoji, type, label, tokens }: VoteOptionProps) => {
 			</div>
 			<div className='flex justify-center flex-col w-full items-center p-4 border-t'>
 				<span className='font-medium text-2xl'>{tokens}</span>
-				<p>Tokens</p>
+				<p>Votes</p>
 			</div>
 		</div>
 	);
