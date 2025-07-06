@@ -7,6 +7,8 @@ import Footer from "./components/Footer";
 import Navbar from "./components/Navbar";
 import { useStore } from "@/app/store";
 import { useEffect } from "react";
+import Image from "next/image";
+import ZKDAO_LOGO from "@/app/assets/zkDAOLogo.svg";
 
 export default function Home() {
 	const { chainId } = useAccount();
@@ -36,8 +38,9 @@ export default function Home() {
 			{fetchingDaos && fetchingCheckUpkeep ? (
 				// skeleton loading
 				<div className='flex items-center justify-center h-screen flex-col space-y-4'>
-					<span className='loading loading-infinity loading-xl'></span>
-					<span>Loading...</span>
+					<Image src={ZKDAO_LOGO} alt='zkDAO Logo' width={100} height={100} className='animate-pulse' />
+					{/* <span className='loading loading-infinity loading-xl'></span> */}
+					<span>Loading Daos...</span>
 				</div>
 			) : (
 				<ExplorerDAOS />
