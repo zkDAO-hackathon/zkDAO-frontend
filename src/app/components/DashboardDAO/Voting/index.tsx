@@ -82,6 +82,7 @@ const Voting = ({ leftTime, address, tally, idProposal, state }: VotingProps) =>
 			try {
 				const hasVoted = await governor.hasVoted(accountAddress as Address, BigInt(idProposal));
 				setLoading(false);
+				console.log("Has voted:", hasVoted);
 				setHasVoted(hasVoted);
 			} catch (error) {
 				console.error("Error checking if user has voted:", error);
