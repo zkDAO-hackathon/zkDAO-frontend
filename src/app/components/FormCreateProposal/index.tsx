@@ -10,6 +10,7 @@ import { useWalletClient } from "wagmi";
 import { toast } from "sonner";
 import { closeModal } from "@/app/helpers/actions.modal";
 import { useState } from "react";
+import { parseEther } from "viem";
 
 const FormCreateProposal = () => {
 	const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -47,7 +48,7 @@ const FormCreateProposal = () => {
 			toast.error("Amount must be greater than zero");
 			return;
 		}
-		toast.promise(governor.createProposal(address, data.description, BigInt(amount)), {
+		toast.promise(governor.createProposal(address, data.description, parseEther(Number(amount).toString())), {
 			loading: "Creating proposal...",
 			success: () => {
 				reset();
