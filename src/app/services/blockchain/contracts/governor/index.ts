@@ -190,14 +190,14 @@ export class GovernorContract {
 			const daoCounter = await zkDAO.read.getDaoCounter();
 			const dao = (await zkDAO.read.getDao([daoCounter])) as DaoStruct;
 
-			const tokenGovernor = getContract({
-				address: dao.token,
-				abi: GOVERNOR_TOKEN_JSON.abi,
-				client: {
-					public: this.publicClient,
-					wallet: this.walletClient,
-				},
-			});
+			// const tokenGovernor = getContract({
+			// 	address: dao.token,
+			// 	abi: GOVERNOR_TOKEN_JSON.abi,
+			// 	client: {
+			// 		public: this.publicClient,
+			// 		wallet: this.walletClient,
+			// 	},
+			// });
 			const governor = getContract({
 				address: dao.governor,
 				abi: GOVERNON_JSON.abi,
@@ -207,16 +207,22 @@ export class GovernorContract {
 				},
 			});
 			const AMOUNT = parseEther(amount.toString());
-			const targets = [getAddress(tokenGovernor.address)];
+			const targets = [getAddress(dao.governor)];
 			const values = [BigInt(0)];
+			const CHAINS = this.publicClient.chain === sepolia ? "sepolia" : "fuji";
+			// const mintCallData = encodeFunctionData({
+			// 	abi: tokenGovernor.abi,
+			// 	functionName: "mintBatch",
+			// 	args: [[proposer], [AMOUNT]],
+			// });
 
-			const mintCallData = encodeFunctionData({
-				abi: tokenGovernor.abi,
-				functionName: "mintBatch",
-				args: [[proposer], [AMOUNT]],
+			const transferCallData = encodeFunctionData({
+				abi: governor.abi,
+				functionName: "transferCrosschainTreasury",
+				args: [dao.governor, CCIP_BNM_TOKEN(CHAINS), BigInt(AMOUNT)],
 			});
 
-			const calldatas = [mintCallData];
+			const calldatas = [transferCallData];
 			const description = `Transfer 1 token (1000000000000000000 in wei) of the CCIP-BnM Token from the Treasury to the Governor Contract via CCIP, specifically to the Governor Contract on the Avalanche Fuji network as the destination chain.`;
 
 			const proposeTx = await governor.write.propose([targets, values, calldatas, description], { account });
