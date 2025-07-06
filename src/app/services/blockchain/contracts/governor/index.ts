@@ -13,12 +13,13 @@ import {
 	getAddress,
 	parseEther,
 } from "viem";
-import { GOVERNON_JSON, ZKDAO_JSON, GOVERNOR_TOKEN_JSON, CCIP_BNM_TOKEN } from "@/app/config/const";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { GOVERNON_JSON, ZKDAO_JSON, GOVERNOR_TOKEN_JSON, CCIP_BNM_TOKEN, FACTORY, AMOUNT, LINK_TOKEN } from "@/app/config/const";
 import { DaoStruct, Proposal, ProposalDto, ProposalStruct, Tally } from "@/app/modals";
 import { avalancheFuji, sepolia } from "viem/chains";
 import { LINK_ADDRESS } from "@/app/config/const";
 import { MerkleProofAPIClient } from "@/app/services/http/merkle-proof";
-import { CircuitAPIClient } from "@/app/services/http/circuit-proof";
+// import { CircuitAPIClient } from "@/app/services/http/circuit-proof";
 
 export class GovernorContract {
 	private address: Address;
@@ -52,6 +53,15 @@ export class GovernorContract {
 			},
 		});
 	}
+	private getReadContractZKDAO() {
+		return getContract({
+			address: this.address,
+			abi: ZKDAO_JSON.abi,
+			client: {
+				public: this.publicClient,
+			},
+		});
+	}
 
 	private getWriteContract() {
 		if (!this.walletClient) {
@@ -71,6 +81,28 @@ export class GovernorContract {
 	// =========================
 	//        READ METHODS
 	// =========================
+
+	async getFee(account: Address, token: Address, amount: number): Promise<bigint> {
+		try {
+			const contract = this.getReadContractZKDAO();
+			const fee = (await contract.read.getCcipFee([account, token, BigInt(amount)])) as bigint;
+			return fee;
+		} catch (error) {
+			console.error("❌", error);
+			return BigInt(0);
+		}
+	}
+
+	async hasVoted(account: Address, proposalId: bigint): Promise<boolean> {
+		try {
+			const contract = this.getReadContract();
+			const hasVoted = (await contract.read.getNullifierUsedByAddress([proposalId, account])) as boolean;
+			return hasVoted;
+		} catch (error) {
+			console.error("❌", error);
+			return false;
+		}
+	}
 
 	async getProposalCounter(): Promise<number> {
 		try {
@@ -185,7 +217,7 @@ export class GovernorContract {
 			});
 
 			const calldatas = [mintCallData];
-			// const description = `Add ${proposer} to the DAO and give them ${amount} tokens`;
+			const description = `Add ${proposer} to the DAO and give them ${amount} tokens`;
 
 			const proposeTx = await governor.write.propose([targets, values, calldatas, description], { account });
 
@@ -201,7 +233,7 @@ export class GovernorContract {
 		}
 	}
 
-	async castVoteZK(proposalId: number, amount: bigint, option: 0 | 1 | 2): Promise<void> {
+	async castVoteZK(proposalId: string | number, option: 0 | 1 | 2): Promise<void> {
 		try {
 			if (!this.walletClient) {
 				throw new Error("walletClient not set. Call setWalletClient() first.");
@@ -213,7 +245,7 @@ export class GovernorContract {
 			}
 
 			const merkleProofAPI = new MerkleProofAPIClient();
-			const circuitAPIClient = new CircuitAPIClient();
+			// const circuitAPIClient = new CircuitAPIClient();
 
 			const zkDAO = getContract({
 				address: ZKDAO_JSON.address as `0x${string}`,
@@ -240,7 +272,7 @@ export class GovernorContract {
 
 			const proposal = (await governor.read.getProposal([proposalCounter])) as ProposalStruct;
 
-			const hashedMessage = keccak256(toBytes(`Add ${this.address} to the DAO and give them ${amount} tokens`));
+			const hashedMessage = keccak256(toBytes(`Add ${this.address} to the DAO and give them ${AMOUNT} tokens`));
 
 			// const proposalIdString = (proposal.id as string | number | bigint).toString();
 
@@ -248,7 +280,6 @@ export class GovernorContract {
 				message: { raw: hashedMessage },
 				account: account,
 			});
-			console.log("Signature:", signature);
 
 			const pubKey = await recoverPublicKey({
 				signature,
@@ -273,20 +304,38 @@ export class GovernorContract {
 
 			const merkleProof = await merkleProofAPI.getMerkleProof(getAddress(dao.governor), proposalId.toString(), account.address);
 
-			console.log("Merkle Proof:", merkleProof.index);
-
-			const zkproof = await circuitAPIClient.generateZKProof({
-				_proposalId: proposalId.toString(),
-				_secret: merkleProof.secret,
-				_voter: getAddress(account.address),
-				_weight: merkleProof.weight.toString(),
-				_choice: option,
-				_snapshot_merkle_tree: merkleProof.snapshotMerkleTree,
-				_leaf: merkleProof.leaf,
-				_index: merkleProof.index.toString(),
-				_path: merkleProof.path,
-				...ECDSA,
+			const response = await fetch("http://localhost:3000/api", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					_proposalId: proposalId.toString(),
+					_secret: merkleProof.secret,
+					_voter: getAddress(account.address),
+					_weight: merkleProof.weight.toString(),
+					_choice: option,
+					_snapshot_merkle_tree: merkleProof.snapshotMerkleTree,
+					_leaf: merkleProof.leaf,
+					_index: merkleProof.index.toString(),
+					_path: merkleProof.path,
+					...ECDSA,
+				}),
 			});
+			const zkproof = await response.json();
+
+			// const zkproof = await circuitAPIClient.generateZKProof({
+			// 	_proposalId: proposalId.toString(),
+			// 	_secret: merkleProof.secret,
+			// 	_voter: getAddress(account.address),
+			// 	_weight: merkleProof.weight.toString(),
+			// 	_choice: option,
+			// 	_snapshot_merkle_tree: merkleProof.snapshotMerkleTree,
+			// 	_leaf: merkleProof.leaf,
+			// 	_index: merkleProof.index.toString(),
+			// 	_path: merkleProof.path,
+			// 	...ECDSA,
+			// });
 			const castZKVoteTx = await governor.write.castZKVote([proposal.id, zkproof.proofBytes, zkproof.publicInputs], { account: account });
 
 			await this.publicClient.waitForTransactionReceipt({
@@ -297,7 +346,7 @@ export class GovernorContract {
 		}
 	}
 
-	async quequeProposal(factory: Address, amount: number): Promise<void> {
+	async quequeProposal(): Promise<void> {
 		try {
 			if (!this.walletClient) {
 				throw new Error("walletClient not set. Call setWalletClient() first.");
@@ -319,6 +368,7 @@ export class GovernorContract {
 
 			const daoCounter = await zkDAO.read.getDaoCounter();
 			const dao = (await zkDAO.read.getDao([daoCounter])) as DaoStruct;
+			const chain = this.publicClient.chain === sepolia ? "sepolia" : "fuji";
 
 			const governor = getContract({
 				address: dao.governor,
@@ -332,31 +382,43 @@ export class GovernorContract {
 			const proposalCounter = await governor.read.getProposalCounter();
 			const proposal = (await governor.read.getProposal([proposalCounter])) as ProposalStruct;
 
-			const targets = [zkDAO.address];
+			const targets = [dao.governor];
 			const values = [BigInt(0)];
+
 			const transferCallData = encodeFunctionData({
-				abi: zkDAO.abi,
-				functionName: "transferTokensPayLINK",
-				args: [factory as Address, CCIP_BNM_TOKEN("sepolia"), BigInt(amount)],
+				abi: governor.abi,
+				functionName: "transferCrosschainTreasury",
+				args: [dao.governor, CCIP_BNM_TOKEN(chain), BigInt(AMOUNT)],
 			});
 			const calldatas = [transferCallData];
-
-			const description = `Cross-chain transfer ${amount} tokens to ${factory} via CCIP`;
+			console.log("amount", AMOUNT);
+			const description = `Cross-chain transfer ${AMOUNT} tokens to ${dao.governor} via CCIP`;
 
 			const descriptionHash = keccak256(toBytes(description));
 
+			console.log("zkAddres", zkDAO.address);
+			console.log("description", description);
+			console.log("target", targets);
+			console.log("values", values);
+			console.log("calldatas", calldatas);
+			console.log("descriptionHash", descriptionHash);
+
 			const queueTx = await governor.write.queue([targets, values, calldatas, descriptionHash], { account });
 
-			await this.publicClient.waitForTransactionReceipt({
+			const txTransaction = await this.publicClient.waitForTransactionReceipt({
 				hash: queueTx,
 			});
+
+			if (txTransaction.status !== "success") {
+				throw new Error(`Transaction failed with status: ${txTransaction.status}`);
+			}
 
 			console.log(`✅ Queued proposal ${proposal.id}. tx hash: ${queueTx}`);
 		} catch (error) {
 			throw new Error(`Failed to queque proposal: ${error instanceof Error ? error.message : "Unknown error"}`);
 		}
 	}
-	async execute(factory: Address, amount: number): Promise<void> {
+	async execute(): Promise<void> {
 		try {
 			if (!this.walletClient) {
 				throw new Error("walletClient not set. Call setWalletClient() first.");
@@ -387,31 +449,40 @@ export class GovernorContract {
 					wallet: this.walletClient,
 				},
 			});
+			// const chain = this.publicClient.chain === sepolia ? "sepolia" : "fuji";
+			// const proposalCounter = await governor.read.getProposalCounter();
+			// const proposal = (await governor.read.getProposal([proposalCounter])) as ProposalStruct;
 
-			const proposalCounter = await governor.read.getProposalCounter();
-			const proposal = (await governor.read.getProposal([proposalCounter])) as ProposalStruct;
-
-			const targets = [zkDAO.address];
+			const targets = [dao.governor];
 			const values = [BigInt(0)];
+			// const fee = await this.getFee(FACTORY, LINK_TOKEN(chain), Number(AMOUNT));
+			// console.log("fee", fee);
 
 			const chainName = this.publicClient.chain === sepolia ? "sepolia" : "avalancheFuji";
 			const transferCallData = encodeFunctionData({
-				abi: zkDAO.abi,
-				functionName: "transferTokensPayLINK",
-				args: [factory, CCIP_BNM_TOKEN(chainName), BigInt(amount)],
+				abi: governor.abi,
+				functionName: "transferCrosschainTreasury",
+				args: [dao.governor, CCIP_BNM_TOKEN(chainName), BigInt(AMOUNT)],
 			});
 			const calldatas = [transferCallData];
 
-			const description = `Cross-chain transfer ${amount} tokens to ${factory} via CCIP`;
+			const description = `Cross-chain transfer ${AMOUNT} tokens to ${dao.governor} via CCIP`;
 			const descriptionHash = keccak256(toBytes(description));
+			console.log({
+				targets: targets,
+				values: values,
+				// fee: fee,
+				descriptionHash: descriptionHash,
+			});
 
 			const executeTx = await governor.write.execute([targets, values, calldatas, descriptionHash], { account });
 
-			await this.publicClient.waitForTransactionReceipt({
+			const txTransaction = await this.publicClient.waitForTransactionReceipt({
 				hash: executeTx,
 			});
-
-			console.log(`✅ Executed proposal ${proposal.id}. tx hash: ${executeTx}`);
+			if (txTransaction.status !== "success") {
+				throw new Error(`Transaction failed with status: ${txTransaction.status}`);
+			}
 		} catch (error) {
 			throw new Error(`Failed to execute proposal: ${error instanceof Error ? error.message : "Unknown error"}`);
 		}
@@ -512,7 +583,7 @@ export class GovernorContract {
 function mapProposalDtoToProposal(dto: ProposalDto): Proposal {
 	console.log("Mapping Proposal DTO to Proposal:", dto);
 	return {
-		id: Number(dto.id),
+		id: dto.id,
 		proposalNumber: Number(dto.proposalNumber),
 		createdAt: new Date(Number(dto.createdAt) * 1000),
 		proposer: dto.proposer,
