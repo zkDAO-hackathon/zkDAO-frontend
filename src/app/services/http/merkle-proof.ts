@@ -18,6 +18,7 @@ export class MerkleProofAPIClient {
 	}
 
 	async getMerkleProof(dao: string, proposalId: string, address: string): Promise<MerkleProof> {
+		// console.log()
 		const url = `https://merkle.kaiser-soft.com/merkle-tree/getMerkleProof/${dao}/proposals/${proposalId}/${address}`;
 		console.log(`🌐 Fetching Merkle proof from: ${url}`);
 
