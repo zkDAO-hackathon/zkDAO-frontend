@@ -24,7 +24,7 @@ const VoteOption = ({ emoji, type, label, tokens }: VoteOptionProps) => {
 			<div className='card-body p-4'>
 				<div className='flex items-center flex-col justify-center gap-3 mb-2'>
 					<span className='text-2xl'>{emoji}</span>
-					<h4 className='font-medium text-lg'>{label}</h4>
+					<h4 className='font-medium text-lg text-center'>{label}</h4>
 				</div>
 			</div>
 			<div className='flex justify-center flex-col w-full items-center p-4 border-t'>
