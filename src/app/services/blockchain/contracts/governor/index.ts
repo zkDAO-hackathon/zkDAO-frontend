@@ -418,7 +418,7 @@ export class GovernorContract {
 			throw new Error(`Failed to queque proposal: ${error instanceof Error ? error.message : "Unknown error"}`);
 		}
 	}
-	async execute(): Promise<void> {
+	async execute(): Promise<Address> {
 		try {
 			if (!this.walletClient) {
 				throw new Error("walletClient not set. Call setWalletClient() first.");
@@ -483,6 +483,7 @@ export class GovernorContract {
 			if (txTransaction.status !== "success") {
 				throw new Error(`Transaction failed with status: ${txTransaction.status}`);
 			}
+			return executeTx;
 		} catch (error) {
 			throw new Error(`Failed to execute proposal: ${error instanceof Error ? error.message : "Unknown error"}`);
 		}
