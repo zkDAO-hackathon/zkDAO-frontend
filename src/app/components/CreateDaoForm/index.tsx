@@ -6,7 +6,7 @@ import { CHAINS } from "@/app/helpers/list.chains";
 import Image from "next/image";
 import { FaCheck, FaCloudArrowUp, FaMinus, FaPlus } from "react-icons/fa6";
 import { FaArrowLeft, FaArrowRight, FaExclamationTriangle, FaPaperPlane, FaPlusCircle } from "react-icons/fa";
-import { Address } from "viem";
+import { Address, parseEther } from "viem";
 import { toast } from "sonner";
 import { ZkDaoContract } from "@/app/services/blockchain/contracts/zk-dao.ts/";
 import { useWalletClient, useAccount } from "wagmi";
@@ -117,7 +117,7 @@ const CreateDaoForm = () => {
 
 		temporalRecipients.forEach((recipient) => {
 			to.push(recipient.address as Address);
-			amounts.push(BigInt(recipient.amount));
+			amounts.push(parseEther(BigInt(recipient.amount).toString()));
 		});
 		const amount = BigInt(5000000000000000000);
 
