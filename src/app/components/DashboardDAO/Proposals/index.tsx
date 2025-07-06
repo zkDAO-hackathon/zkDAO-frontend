@@ -1,6 +1,8 @@
 import Link from "next/link";
 import CardProposals from "./CardProposals";
 import { Proposal } from "@/app/modals";
+import Image from "next/image";
+import SVG404V4 from "@/app/assets/404-v4.svg";
 
 interface ProposalsProps {
 	id_dao?: string;
@@ -12,27 +14,36 @@ const Proposals = ({ id_dao, proposals }: ProposalsProps) => {
 			<div className='tabs tabs-lift'>
 				<input type='radio' name='proposal_tabs' className='tab ' aria-label='Success proposals' defaultChecked />
 				<div className='tab-content bg-base-100 p-4'>
-					<div className='flex flex-col gap-4 h-96 overflow-y-auto'>
-						{proposals
-							.filter((p) => p.state === 3)
-							.map((proposal, index) => (
-								<div key={index}>
-									<Link href={`/dao/${id_dao}/proposals/${proposal.proposalNumber}`} key={proposal.id} className='no-underline'>
-										<CardProposals
-											key={proposal.id}
-											status={proposal.state.toString()}
-											name={proposal.id.toString()}
-											description={proposal.description}
-											by={proposal.proposer}
-											timePublished={proposal.createdAt.toString()}
-											timeLeft={
-												proposal?.timeForVoting instanceof Date ? proposal.timeForVoting.getTime() : proposal?.timeForVoting
-											}
-										/>
-									</Link>
-								</div>
-							))}
-					</div>
+					{proposals.filter((p) => p.state === 3).length === 0 ? (
+						<>
+							<Image src={SVG404V4} alt='No proposals found' width={200} height={200} className='mx-auto mb-4' />
+							<h3 className='text-xl font-bold mb-2 text-center'>No Success Proposals</h3>
+						</>
+					) : (
+						<div className='flex flex-col gap-4 h-96 overflow-y-auto'>
+							{proposals
+								.filter((p) => p.state === 3)
+								.map((proposal, index) => (
+									<div key={index}>
+										<Link href={`/dao/${id_dao}/proposals/${proposal.proposalNumber}`} key={proposal.id} className='no-underline'>
+											<CardProposals
+												key={proposal.id}
+												status={proposal.state.toString()}
+												name={proposal.id.toString()}
+												description={proposal.description}
+												by={proposal.proposer}
+												timePublished={proposal.createdAt.toString()}
+												timeLeft={
+													proposal?.timeForVoting instanceof Date
+														? proposal.timeForVoting.getTime()
+														: proposal?.timeForVoting
+												}
+											/>
+										</Link>
+									</div>
+								))}
+						</div>
+					)}
 				</div>
 
 				{/* <input type='radio' name='proposal_tabs' className='tab' aria-label='Closed proposals' />
