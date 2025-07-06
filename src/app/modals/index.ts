@@ -56,6 +56,7 @@ export interface Proposal {
 	timeForVoting: string | Date;
 	timeDelay?: number;
 	tally: Tally;
+	daoId?: number;
 }
 
 export interface TallyStruct {
