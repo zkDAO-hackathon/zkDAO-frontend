@@ -46,7 +46,7 @@ export interface ProposalDto {
 }
 
 export interface Proposal {
-	id: number;
+	id: bigint;
 	proposalNumber: number;
 	createdAt: Date;
 	proposer: Address;
@@ -54,6 +54,7 @@ export interface Proposal {
 	cid: string;
 	state: number;
 	timeForVoting: string | Date;
+	timeDelay?: number;
 	tally: Tally;
 }
 
@@ -72,4 +73,16 @@ export interface Tally {
 export interface CheckUpkeep {
 	upkeepNeeded: boolean;
 	performData: Hex;
+}
+
+export interface QuoteProposal {
+	dao: Address;
+	voteToken: Address;
+	daoId: bigint;
+	proposalId: bigint;
+	snapshot: bigint;
+	proposalBlock: bigint;
+	timeLeft: bigint;
+	quequed: boolean;
+	executed: boolean;
 }
