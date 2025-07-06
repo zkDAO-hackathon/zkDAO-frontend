@@ -12,10 +12,13 @@ import { Dao } from "@/app/modals/index";
 import { useEffect, useState, unstable_ViewTransition as ViewTransition } from "react";
 import { IoMdPaper } from "react-icons/io";
 import { useStore } from "@/app/store";
-import { Address } from "viem";
+
 import { useAccount } from "wagmi";
 import { NETWORKS_BY_CHAIN_ID } from "@/app/config/const";
 import Breadcrumbs from "@/app/components/Breadcrumbs";
+import Image from "next/image";
+import ZKDAO_LOGO from "@/app/assets/zkDAOLogo.svg";
+import { FaRegEye } from "react-icons/fa6";
 
 const DashboardPage = () => {
 	const { getDao } = useStore();
@@ -38,9 +41,12 @@ const DashboardPage = () => {
 		return (
 			<main className='flex items-center justify-center h-screen'>
 				<div className='text-center flex flex-col items-center justify-center'>
-					<span className='loading loading-infinity loading-xl'></span>
-					<h1 className='text-2xl font-bold mb-4'>Loading DAO...</h1>
-					<p className='text-gray-600'>Please wait while we fetch the DAO details.</p>
+					<div className='flex items-center justify-center h-screen flex-col space-y-4'>
+						<Image src={ZKDAO_LOGO} alt='zkDAO Logo' width={100} height={100} className='animate-pulse' />
+						{/* <span className='loading loading-infinity loading-xl'></span> */}
+						<span>Loading Dao...</span>
+						<p className='text-gray-600'>Please wait while we fetch the DAO details.</p>
+					</div>
 				</div>
 			</main>
 		);
@@ -80,6 +86,7 @@ const DashboardPage = () => {
 											<h1 className='text-2xl font-bold'>Governance Proposals</h1>
 										</div>
 										<Link href={`${id_dao}/proposals`} className='btn btn-primary'>
+											<FaRegEye className='inline mr-2' />
 											View All Proposals
 										</Link>
 									</div>
@@ -102,10 +109,10 @@ const DashboardPage = () => {
 						<div>
 							<ContractInfo
 								chain={NETWORKS_BY_CHAIN_ID[chainId ?? 1]} // Fallback to chain ID 1 if undefined
-								daoAddress={(daoFront?.token.toString() as Address) || "0x00000@0000000000000000000"}
+								daoAddress={daoFront?.governor || "0x00000@0000000000000000000"}
 								launchedDate={(daoFront?.createdAt as Date) || new Date()}
 							/>
-							<Assets />
+							<Assets daoAddress={daoFront?.governor} />
 							{/* <Members /> */}
 							<ModalDelegateTokens />
 						</div>
