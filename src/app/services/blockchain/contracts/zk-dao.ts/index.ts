@@ -1,6 +1,6 @@
 import { Address, Hex, WalletClient, createPublicClient, getContract, http } from "viem";
 import { ZKDAO_JSON } from "@/app/config/const";
-import { CheckUpkeep, Dao, DaoStruct } from "@/app/modals";
+import { CheckUpkeep, Dao, DaoStruct, QuoteProposal } from "@/app/modals";
 import { avalancheFuji, sepolia } from "viem/chains";
 import { GovernorContract } from "../governor";
 import { GovernorParams, GovernorTokenParams } from "@/app/types/form.dao.types";
@@ -117,6 +117,18 @@ export class ZkDaoContract {
 		} catch (error) {
 			console.error("❌", error);
 			return [];
+		}
+	}
+
+	async getQueueWithTimeLeftFunction(): Promise<QuoteProposal[]> {
+		try {
+			const contract = this.getReadContract();
+			const quote = (await contract.read.getQueueWithTimeLeft()) as QuoteProposal[];
+			console.log("✅ Quotes with time left:", quote);
+			return quote;
+		} catch (error) {
+			console.error("❌", error);
+			throw new Error(`Failed to get quote with time left: ${error instanceof Error ? error.message : "Unknown error"}`);
 		}
 	}
 	// =========================
