@@ -43,7 +43,7 @@ const DashboardPage = () => {
 				<div className='text-center flex flex-col items-center justify-center'>
 					<div className='flex items-center justify-center h-screen flex-col space-y-4'>
 						<Image src={ZKDAO_LOGO} alt='zkDAO Logo' width={100} height={100} className='animate-pulse' />
-						{/* <span className='loading loading-infinity loading-xl'></span> */}
+
 						<span>Loading Dao...</span>
 						<p className='text-gray-600'>Please wait while we fetch the DAO details.</p>
 					</div>
