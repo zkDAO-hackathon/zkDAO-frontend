@@ -9,6 +9,7 @@ import { Proposal } from "@/app/modals";
 import { MdHowToVote } from "react-icons/md";
 import SVG404 from "@/app/assets/404-v2.svg";
 import Image from "next/image";
+import VoteOption from "@/app/components/DashboardDAO/Voting/Votings";
 
 const PageProposal = () => {
 	const { idProposal, id_dao } = useParams();
@@ -38,7 +39,6 @@ const PageProposal = () => {
 
 			<header className='mb-6 mt-4'>
 				<h1 className='text-3xl font-bold text-gray-900'>Proposal Details</h1>
-				<p className='text-gray-600 mt-2'>ID: {idProposal || "Loading..."}</p>
 			</header>
 
 			<div className='grid grid-cols-1 lg:grid-cols-2 gap-8'>
@@ -60,8 +60,19 @@ const PageProposal = () => {
 						</>
 					) : (
 						<>
+							<div className='grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6 mb-8'>
+								<VoteOption emoji='👍' type='yes' label='Yes to approve' tokens={proposal?.tally?.forVotes as string} />
+
+								<VoteOption emoji='⊘' type='abstain' label='Abstain' tokens={proposal?.tally?.abstainVotes as string} />
+
+								<VoteOption emoji='👎' type='no' label='No to approve' tokens={proposal?.tally?.againstVotes as string} />
+							</div>
 							<Image src={SVG404} alt='Voting not active' className='mx-auto mb-4' width={200} height={200}></Image>
-							<p className='text-gray-500 text-center'>Voting is not active for this proposal.</p>
+							{proposal?.state === 7 ? (
+								<p className='text-center text-2xl font-bold'>This proposal was executed.</p>
+							) : (
+								<p className='text-center text-gray-600'>Voting is not active for this proposal.</p>
+							)}
 						</>
 					)}
 				</div>
@@ -71,6 +82,7 @@ const PageProposal = () => {
 					proposedBy={proposal?.proposer || "Unknown Proposer"}
 					publishedAt={proposal?.createdAt ? new Date(proposal.createdAt).toLocaleDateString() : "Unknown Date"}
 					status={proposal?.state.toString() || "Unknown Status"}
+					description={proposal?.description || "No description available."}
 				/>
 			</div>
 		</section>
