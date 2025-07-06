@@ -14,8 +14,11 @@ type TokenDisplay = {
 	formatted: string;
 	icon?: string;
 };
+interface IUseTokens {
+	addressDao: Address;
+}
 
-export function useTokenAssets() {
+export function useTokenAssets({ addressDao }: IUseTokens) {
 	const { address, chainId } = useAccount();
 	const { data: walletClient } = useWalletClient();
 
@@ -25,7 +28,7 @@ export function useTokenAssets() {
 
 	const loadAssets = async () => {
 		if (!address || !chainId || !walletClient) return;
-		console.log(chainId);
+
 		const chainName = NETWORKS_BY_CHAIN_ID[chainId];
 		setNetwork(chainName);
 
@@ -36,7 +39,7 @@ export function useTokenAssets() {
 		const results: TokenDisplay[] = [];
 
 		for (const tokenKey of tokenKeys) {
-			const info = await service.getTokenInfo(tokenKey, address as Address);
+			const info = await service.getTokenInfo(tokenKey, addressDao as Address);
 			if (info) {
 				results.push({
 					symbol: info.symbol,
