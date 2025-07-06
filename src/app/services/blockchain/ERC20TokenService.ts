@@ -16,8 +16,8 @@ export class ERC20TokenService {
 
 	constructor(private readonly network: keyof typeof TOKENS, walletClient?: WalletClient) {
 		this.publicClient = createPublicClient({
-			chain: CHAINS[network as keyof typeof CHAINS],
-			transport: http(RPCS[network as keyof typeof RPCS]),
+			chain: CHAINS[network as keyof typeof CHAINS] || CHAINS.sepolia,
+			transport: http(RPCS[network as keyof typeof RPCS]) || http(RPCS.sepolia),
 		});
 
 		this.walletClient = walletClient ?? null;
@@ -28,11 +28,12 @@ export class ERC20TokenService {
 	}
 
 	private getTokenData(tokenKey: string) {
-		const networkTokens = TOKENS[this.network];
+		const networkTokens = TOKENS[this.network] || TOKENS.sepolia;
 		return networkTokens ? networkTokens[tokenKey as keyof typeof networkTokens] : undefined;
 	}
 
 	private getContract(address: Address) {
+		// Always create contract with public client, wallet client is optional
 		return getContract({
 			address,
 			abi: erc20Abi,
@@ -96,7 +97,12 @@ export class ERC20TokenService {
 
 	async approve(tokenKey: string, spender: Address, amount: bigint): Promise<string | undefined> {
 		const token = this.getTokenData(tokenKey);
-		if (!token || !this.walletClient) return;
+		if (!token) return;
+
+		if (!this.walletClient) {
+			console.error("❌ No wallet client provided for approve operation");
+			return undefined;
+		}
 
 		try {
 			const hash = await this.walletClient.writeContract({
