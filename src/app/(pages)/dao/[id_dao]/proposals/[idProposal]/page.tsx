@@ -83,6 +83,7 @@ const PageProposal = () => {
 					publishedAt={proposal?.createdAt ? new Date(proposal.createdAt).toLocaleDateString() : "Unknown Date"}
 					status={proposal?.state.toString() || "Unknown Status"}
 					description={proposal?.description || "No description available."}
+					cid={proposal?.cid || "No CID available"}
 				/>
 			</div>
 		</section>

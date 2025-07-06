@@ -1,6 +1,6 @@
 import { TbListDetails } from "react-icons/tb";
 
-import { FaUserLarge } from "react-icons/fa6";
+import { FaToolbox, FaUserLarge } from "react-icons/fa6";
 import { CiStar } from "react-icons/ci";
 import { MdOutlineAccessTimeFilled } from "react-icons/md";
 import { IoHelpCircleOutline } from "react-icons/io5";
@@ -11,7 +11,8 @@ interface DetailsDaoProposalProps {
 	proposedBy: string;
 	publishedAt: string;
 	status: string;
-	description?: string; // Optional description field
+	description?: string;
+	cid: string;
 }
 const statusToState: Record<string, ProposalState> = {
 	0: ProposalState.Pending,
@@ -24,7 +25,7 @@ const statusToState: Record<string, ProposalState> = {
 	7: ProposalState.Canceled,
 };
 
-const DetailsDaoProposal = ({ id, proposedBy, publishedAt, status, description }: DetailsDaoProposalProps) => {
+const DetailsDaoProposal = ({ id, proposedBy, publishedAt, status, description, cid }: DetailsDaoProposalProps) => {
 	const currentState = statusToState[status];
 	return (
 		<div className='bg-white rounded-2xl shadow-md p-6 hover:shadow-lg transition-all duration-300'>
@@ -86,6 +87,16 @@ const DetailsDaoProposal = ({ id, proposedBy, publishedAt, status, description }
 							Description
 						</span>
 						<p className='font-medium text-gray-800 leading-relaxed'>{description}</p>
+					</div>
+				)}
+
+				{cid && (
+					<div className='flex flex-col gap-2 bg-white p-5 rounded-xl shadow-sm border border-gray-100 hover:border-indigo-200 transition-all col-span-1 md:col-span-2'>
+						<span className='text-gray-500 font-medium flex items-center'>
+							<FaToolbox className='mr-2 text-indigo-500 text-xl' />
+							CID
+						</span>
+						<p className='font-medium text-gray-800 leading-relaxed'>{cid}</p>
 					</div>
 				)}
 			</div>
