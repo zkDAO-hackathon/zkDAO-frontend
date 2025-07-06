@@ -20,6 +20,11 @@ export const TOKENS = {
 			address: "0x466D489b6d36E7E3b824ef491C225F5830E81cC1",
 			icon: "https://d2f70xi62kby8n.cloudfront.net/tokens/ccip-lnm.webp",
 		},
+		LINK: {
+			symbol: "LINK",
+			address: "0x779877A7B0D9E8603169DdbD7836e478b4624789",
+			icon: "/chainlink-token.png",
+		},
 	},
 
 	fuji: {
@@ -37,6 +42,11 @@ export const TOKENS = {
 			symbol: "CCIP-LnM",
 			address: "0x70F5c5C40b873EA597776DA2C21929A8282A3b35",
 			icon: "https://d2f70xi62kby8n.cloudfront.net/tokens/ccip-lnm.webp",
+		},
+		LINK: {
+			symbol: "LINK",
+			address: "0x0b9d5D9136855f6FEc3c0993feE6E9CE8a297846",
+			icon: "/chainlink-token.png",
 		},
 		MyToken: {
 			symbol: "MTK",
@@ -70,14 +80,26 @@ export const ZKDAO_JSON = ZkDaoJson;
 export const GOVERNON_JSON = GovernorJson;
 export const GOVERNOR_TOKEN_JSON = GovernorTokenJson;
 
-import { Address } from "viem";
+import { Address, parseEther } from "viem";
 
 export const CCIP_BNM_TOKEN: (chain: string) => Address = (chain: string): Address => {
-	if (chain === "ethereumSepolia") {
+	if (chain === "sepolia") {
 		return TOKENS.sepolia.CCIP_BNM.address as Address;
-	} else if (chain === "avalancheFuji") {
+	} else if (chain === "fuji") {
 		return TOKENS.fuji.CCIP_BNM.address as Address;
 	} else {
 		throw new Error(`Unsupported chain: ${chain}`);
 	}
 };
+
+export const LINK_TOKEN: (chain: string) => Address = (chain: string): Address => {
+	if (chain === "sepolia") {
+		return LINK_ADDRESS.sepolia as Address;
+	} else if (chain === "fuji") {
+		return LINK_ADDRESS.fuji as Address;
+	} else {
+		throw new Error(`Unsupported chain: ${chain}`);
+	}
+};
+export const FACTORY = "0x522D818751B7D596bDD4018065dA7408e2bB8251" as Address;
+export const AMOUNT = parseEther("1");
