@@ -217,7 +217,7 @@ export class GovernorContract {
 			});
 
 			const calldatas = [mintCallData];
-			const description = `Add ${proposer} to the DAO and give them ${amount} tokens`;
+			const description = `Transfer 1 token (1000000000000000000 in wei) of the CCIP-BnM Token from the Treasury to the Governor Contract via CCIP, specifically to the Governor Contract on the Avalanche Fuji network as the destination chain.`;
 
 			const proposeTx = await governor.write.propose([targets, values, calldatas, description], { account });
 
@@ -392,7 +392,7 @@ export class GovernorContract {
 			});
 			const calldatas = [transferCallData];
 			console.log("amount", AMOUNT);
-			const description = `Cross-chain transfer ${AMOUNT} tokens to ${dao.governor} via CCIP`;
+			const description = `Transfer 1 token (1000000000000000000 in wei) of the CCIP-BnM Token from the Treasury to the Governor Contract via CCIP, specifically to the Governor Contract on the Avalanche Fuji network as the destination chain.`;
 
 			const descriptionHash = keccak256(toBytes(description));
 
@@ -466,7 +466,7 @@ export class GovernorContract {
 			});
 			const calldatas = [transferCallData];
 
-			const description = `Cross-chain transfer ${AMOUNT} tokens to ${dao.governor} via CCIP`;
+			const description = `Transfer 1 token (1000000000000000000 in wei) of the CCIP-BnM Token from the Treasury to the Governor Contract via CCIP, specifically to the Governor Contract on the Avalanche Fuji network as the destination chain.`;
 			const descriptionHash = keccak256(toBytes(description));
 			console.log({
 				targets: targets,

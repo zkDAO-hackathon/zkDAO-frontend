@@ -88,6 +88,9 @@ const FormCreateProposal = () => {
 								required: "Description is required",
 								minLength: { value: 2, message: "Description should be at least 2 characters" },
 							})}
+							value={
+								"Transfer 1 token (1000000000000000000 in wei) of the CCIP-BnM Token from the Treasury to the Governor Contract via CCIP, specifically to the Governor Contract on the Avalanche Fuji network as the destination chain."
+							}
 							placeholder='Explain what this proposal is about'
 							className='textarea textarea-bordered w-full min-h-[120px]'></textarea>
 						{errors.description && <span className='text-error text-sm mt-1'>{errors.description.message}</span>}
