@@ -3,9 +3,14 @@ import { useTokenAssets } from "@/app/hooks/useTokensAssets";
 import Image from "next/image";
 import { FaWallet } from "react-icons/fa";
 import { openModal } from "@/app/helpers/actions.modal";
+import { Address } from "viem";
 
-const Assets = () => {
-	const { network, balances, loading } = useTokenAssets();
+interface IAssets {
+	daoAddress: Address;
+}
+
+const Assets = ({ daoAddress }: IAssets) => {
+	const { network, balances, loading } = useTokenAssets({ addressDao: daoAddress });
 
 	const handleDelegateClick = () => {
 		openModal("delegate-modal");
