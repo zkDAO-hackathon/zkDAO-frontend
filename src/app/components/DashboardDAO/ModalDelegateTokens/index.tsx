@@ -8,6 +8,7 @@ import { ZKDAO_JSON } from "@/app/config/const";
 import { GovernorContract } from "@/app/services/blockchain/contracts/governor";
 import { closeModal } from "@/app/helpers/actions.modal";
 import { useState } from "react";
+import { FaPaperPlane } from "react-icons/fa";
 
 const ModalDelegateTokens = () => {
 	const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -33,7 +34,10 @@ const ModalDelegateTokens = () => {
 				reset();
 				return "Tokens delegated successfully";
 			},
-			error: "Error delegating tokens",
+			error: () => {
+				setIsLoading(false);
+				return "Error delegating tokens";
+			},
 		});
 	};
 
@@ -86,7 +90,8 @@ const ModalDelegateTokens = () => {
 
 				<div className='flex gap-2 mt-4'>
 					<button type='submit' className='btn btn-primary flex-1' disabled={isLoading}>
-						Delegate
+						<FaPaperPlane className='inline mr-2' />
+						{isLoading ? "Delegating..." : "Delegate"}
 					</button>
 				</div>
 			</form>
