@@ -14,28 +14,34 @@ type TokenDisplay = {
 	formatted: string;
 	icon?: string;
 };
+
 interface IUseTokens {
 	addressDao: Address;
+	defaultChainId?: number; // Nuevo parámetro opcional
 }
 
-export function useTokenAssets({ addressDao }: IUseTokens) {
-	const { address, chainId } = useAccount();
+export function useTokenAssets({ addressDao, defaultChainId = 11155111 }: IUseTokens) {
+	const { address, chainId: connectedChainId } = useAccount();
 	const { data: walletClient } = useWalletClient();
 
 	const [balances, setBalances] = useState<TokenDisplay[]>([]);
 	const [network, setNetwork] = useState<keyof typeof TOKENS | null>(null);
 	const [loading, setLoading] = useState(false);
 
-	const loadAssets = async () => {
-		if (!address || !chainId || !walletClient) return;
+	// Usar chainId conectado o el valor por defecto
+	const chainId = connectedChainId || defaultChainId;
 
-		const chainName = NETWORKS_BY_CHAIN_ID[chainId];
+	const loadAssets = async () => {
+		if (!chainId) return;
+
+		setLoading(true);
+		const chainName = NETWORKS_BY_CHAIN_ID[chainId] || "sepolia";
+		console.log("Loading assets for chain:", chainName);
 		setNetwork(chainName);
 
 		const service = new ERC20TokenService(chainName, walletClient);
 
 		const tokenKeys = Object.keys(TOKENS[chainName]);
-
 		const results: TokenDisplay[] = [];
 
 		for (const tokenKey of tokenKeys) {
@@ -56,7 +62,7 @@ export function useTokenAssets({ addressDao }: IUseTokens) {
 	useEffect(() => {
 		loadAssets();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [address, chainId, walletClient]);
+	}, [address, chainId, walletClient, addressDao]);
 
 	return {
 		address,
