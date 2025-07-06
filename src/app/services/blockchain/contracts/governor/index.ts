@@ -304,7 +304,7 @@ export class GovernorContract {
 
 			const merkleProof = await merkleProofAPI.getMerkleProof(getAddress(dao.governor), proposalId.toString(), account.address);
 
-			const response = await fetch("http://localhost:3000/api", {
+			const response = await fetch("/api", {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
