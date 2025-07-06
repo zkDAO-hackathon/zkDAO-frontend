@@ -106,8 +106,8 @@ const CreateDaoForm = () => {
 
 		const governor_params: GovernorParams = {
 			name: data.daoName,
-			votingDelay: data.votingDelay,
-			votingPeriod: data.timeToVote.days * 24 * 60 + data.timeToVote.hours * 60 + data.timeToVote.minutes,
+			votingDelay: 500,
+			votingPeriod: 500,
 			proposalThreshold: data.proposalThreshold,
 			quorumFraction: data.quorumFraction,
 		};

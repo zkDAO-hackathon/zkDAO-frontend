@@ -11,6 +11,7 @@ interface QueuedProposal {
 }
 
 const CardQue = ({ proposalNumber, description, state, timeLeft }: QueuedProposal) => {
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	const [timeLeftState, setTimeLeftState] = useState<string>("");
 	console.log("State", state);
 	useEffect(() => {
@@ -72,8 +73,10 @@ const CardQue = ({ proposalNumber, description, state, timeLeft }: QueuedProposa
 					<FaClock className='text-blue-600' />
 				</div>
 				<div>
-					<span className='text-sm text-gray-500 block'>Time left</span>
-					<span className='font-semibold text-gray-800'>{timeLeftState}</span>
+					{/* <span className='text-sm text-gray-500 block'>Time left</span> */}
+					<span className='font-semibold text-gray-800'>
+						<span className='badge badge-ghost badge-lg text-gray-600'>In Queue</span>
+					</span>
 				</div>
 			</div>
 		</div>
