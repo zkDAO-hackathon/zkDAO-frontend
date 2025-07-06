@@ -39,7 +39,6 @@ const Voting = ({ leftTime, address, tally, idProposal, state }: VotingProps) =>
 			if (remaining <= 0) {
 				clearInterval(interval);
 				setTimeLeftState("Voting ended");
-				window.location.reload();
 			} else {
 				const totalSeconds = Math.floor(remaining / 1000);
 				const hours = Math.floor(totalSeconds / 3600);
