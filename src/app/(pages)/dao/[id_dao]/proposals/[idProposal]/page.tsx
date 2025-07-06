@@ -47,13 +47,15 @@ const PageProposal = () => {
 						<MdHowToVote className='inline-block mr-2 text-2xl' aria-hidden='true' />
 						Cast Your Vote
 					</h2>
-					{proposal?.state === 3 ? (
+
+					{proposal?.state === 1 || proposal?.state === 4 || proposal?.state === 5 ? (
 						<>
 							<Voting
 								tally={proposal.tally}
 								leftTime={proposal?.timeForVoting instanceof Date ? proposal.timeForVoting.getTime() : proposal?.timeForVoting}
 								address={proposal?.proposer || "0x0000000000000000000000000000000000000000"}
-								idProposal={idProposal as string}
+								idProposal={proposal?.id.toString()}
+								state={proposal?.state}
 							/>
 						</>
 					) : (
