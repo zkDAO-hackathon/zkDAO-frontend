@@ -39,6 +39,7 @@ const Voting = ({ leftTime, address, tally, idProposal, state }: VotingProps) =>
 			if (remaining <= 0) {
 				clearInterval(interval);
 				setTimeLeftState("Voting ended");
+				window.location.reload();
 			} else {
 				const totalSeconds = Math.floor(remaining / 1000);
 				const hours = Math.floor(totalSeconds / 3600);
@@ -141,10 +142,22 @@ const Voting = ({ leftTime, address, tally, idProposal, state }: VotingProps) =>
 		setLoadingExecute(true);
 		toast.promise(governor.execute(), {
 			loading: "Executing proposal...",
-			success: () => {
+			success: (txHash) => {
 				setLoadingExecute(false);
-				window.location.reload();
-				return "Proposal executed successfully";
+
+				// Generate the explorer URL based on the network
+				const explorerUrl = network === "sepolia" ? `https://sepolia.etherscan.io/tx/${txHash}` : `https://testnet.snowscan.xyz/tx/${txHash}`;
+
+				// Show a toast with transaction details and a clickable action
+				toast(`Transaction: ${txHash.slice(0, 6)}...${txHash.slice(-4)}`, {
+					action: {
+						label: "View in Explorer",
+						onClick: () => window.open(explorerUrl, "_blank"),
+					},
+				});
+
+				setTimeout(() => window.location.reload(), 3000);
+				return "Proposal executed successfully!";
 			},
 			error: (error) => {
 				setLoadingExecute(false);
