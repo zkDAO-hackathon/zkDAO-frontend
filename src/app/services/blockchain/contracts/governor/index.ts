@@ -11,7 +11,6 @@ import {
 	toBytes,
 	recoverPublicKey,
 	getAddress,
-	parseEther,
 } from "viem";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { GOVERNON_JSON, ZKDAO_JSON, GOVERNOR_TOKEN_JSON, CCIP_BNM_TOKEN, FACTORY, AMOUNT, LINK_TOKEN } from "@/app/config/const";
@@ -206,7 +205,7 @@ export class GovernorContract {
 					wallet: this.walletClient,
 				},
 			});
-			const AMOUNT = parseEther(amount.toString());
+			const AMOUNT = amount.toString();
 			const targets = [getAddress(dao.governor)];
 			const values = [BigInt(0)];
 			const CHAINS = this.publicClient.chain === sepolia ? "sepolia" : "fuji";
@@ -224,6 +223,15 @@ export class GovernorContract {
 
 			const calldatas = [transferCallData];
 			const description = `Transfer 1 token (1000000000000000000 in wei) of the CCIP-BnM Token from the Treasury to the Governor Contract via CCIP, specifically to the Governor Contract on the Avalanche Fuji network as the destination chain.`;
+			const descriptionHash = keccak256(toBytes(description));
+
+			console.log({
+				amount: AMOUNT,
+				targets: targets,
+				values: values,
+				calldatas: calldatas,
+				descriptionHash: descriptionHash,
+			});
 
 			const proposeTx = await governor.write.propose([targets, values, calldatas, description], { account });
 
