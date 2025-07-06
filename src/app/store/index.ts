@@ -41,7 +41,8 @@ export const useStore = create<Store>((set) => {
 		getDao: async (daoId: number) => {
 			const dao = await zkDao.getDao(daoId);
 			if (dao) {
-				const queuedProposals = dao.proposals.filter((proposal) => proposal.timeForVoting > new Date()) || [];
+				const queuedProposals =
+					dao.proposals.filter((proposal) => proposal.timeForVoting > new Date()).map((proposal) => ({ ...proposal, daoId: dao.id })) || [];
 				set({ dao, queuedProposals });
 				return dao;
 			}
