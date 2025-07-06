@@ -13,8 +13,8 @@ const Proposals = ({ id_dao, proposals }: ProposalsProps) => {
 				<input type='radio' name='proposal_tabs' className='tab ' aria-label='All proposals' defaultChecked />
 				<div className='tab-content bg-base-100 p-4 shadow-md'>
 					<div className='flex flex-col gap-4 h-96 overflow-y-auto'>
-						{proposals.map((proposal) => (
-							<>
+						{proposals.map((proposal, index) => (
+							<div key={index}>
 								<Link href={`/dao/${id_dao}/proposals/${proposal.proposalNumber}`} key={proposal.id} className='no-underline'>
 									<CardProposals
 										key={proposal.id}
@@ -28,7 +28,7 @@ const Proposals = ({ id_dao, proposals }: ProposalsProps) => {
 										}
 									/>
 								</Link>
-							</>
+							</div>
 						))}
 					</div>
 				</div>
